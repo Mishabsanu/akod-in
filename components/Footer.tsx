@@ -7,7 +7,7 @@ export default async function Footer() {
   const categories = await getCategories();
 
   return (
-    <footer id="contact" className="mt-20 bg-ink text-white/70">
+    <footer id="contact" className="mt-20 bg-black text-white/60">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
         <div>
           <span className="inline-block rounded-2xl bg-white p-2.5">
@@ -51,15 +51,15 @@ export default async function Footer() {
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-white">Contact</h3>
           <ul className="space-y-3 text-sm">
             <li className="flex gap-3">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-sun" />
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-white" />
               Your address here
             </li>
             <li className="flex gap-3">
-              <Phone className="mt-0.5 h-4 w-4 shrink-0 text-sun" />
+              <Phone className="mt-0.5 h-4 w-4 shrink-0 text-white" />
               +91 00000 00000
             </li>
             <li className="flex gap-3">
-              <Mail className="mt-0.5 h-4 w-4 shrink-0 text-sun" />
+              <Mail className="mt-0.5 h-4 w-4 shrink-0 text-white" />
               <a href="mailto:support@akodfood.com" className="hover:text-white">
                 support@akodfood.com
               </a>

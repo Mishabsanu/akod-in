@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  /* Brand red taken from the akod logo */
-  --color-brand: #e3202a;
-  --color-brand-dark: #b8141d;
-  --color-brand-soft: #fdeceb;
-  --color-sun: #f7c42b;
-  --color-leaf: #3f6b2a;
-  --color-cream: #fbf6ef;
-  --color-sand: #f2e9dd;
-  --color-ink: #1d1a17;
-  --color-muted: #6f675f;
-  --color-line: #ebe3d8;
+  /* Black & white store. Colour comes only from the logo and the product packs. */
+  --color-brand: #0a0a0a;
+  --color-brand-dark: #000000;
+  --color-brand-soft: #f2f2f2;
+  --color-sun: #ffffff;
+  --color-leaf: #0a0a0a;
+  --color-cream: #f6f6f6;
+  --color-sand: #e5e5e5;
+  --color-ink: #0a0a0a;
+  --color-muted: #6b6b6b;
+  --color-line: #e5e5e5;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
 }
