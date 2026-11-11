@@ -13,7 +13,7 @@ export default function ProductGallery({ product }: { product: Product }) {
     <div>
       <ProductImage
         product={current}
-        className="aspect-square rounded-3xl border border-line"
+        className="aspect-square rounded-md"
         sizes="(max-width: 768px) 100vw, 50vw"
         priority
       />
@@ -24,7 +24,7 @@ export default function ProductGallery({ product }: { product: Product }) {
               key={src}
               onClick={() => setActive(i)}
               aria-label={`Show photo ${i + 1}`}
-              className={`overflow-hidden rounded-xl border-2 transition ${i === active ? "border-brand" : "border-transparent opacity-70 hover:opacity-100"}`}
+              className={`overflow-hidden rounded-md border-2 transition ${i === active ? "border-neutral-900" : "border-transparent opacity-70 hover:opacity-100"}`}
             >
               <ProductImage product={{ ...product, image: src }} className="aspect-square" sizes="96px" />
             </button>

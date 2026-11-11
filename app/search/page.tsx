@@ -1,9 +1,9 @@
-import { SearchX } from "lucide-react";
+import { Search, SearchX } from "lucide-react";
 import EmptyState from "@/components/EmptyState";
 import ProductCard from "@/components/ProductCard";
 import { getProducts, searchProducts } from "@/lib/data";
 
-export const metadata = { title: "Search | AKOD Food" };
+export const metadata = { title: "Shop | AKOD Food" };
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const { q = "" } = await searchParams;
@@ -11,12 +11,20 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const results = term ? await searchProducts(term) : await getProducts();
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">{term ? "Search" : "Shop"}</p>
-      <h1 className="mt-1.5 font-display text-3xl font-semibold text-ink">
-        {term ? <>Results for &ldquo;{term}&rdquo;</> : "All products"}
-      </h1>
-      <p className="mt-2 text-sm text-muted">
+    <div className="mx-auto max-w-[1440px] px-6 py-10 sm:px-10">
+      <form action="/search" role="search" className="relative max-w-xl">
+        <Search className="pointer-events-none absolute left-0 top-1/2 h-5 w-5 -translate-y-1/2 text-neutral-400" strokeWidth={1.5} />
+        <input
+          name="q"
+          defaultValue={term}
+          placeholder="Search snacks, oils, honey…"
+          aria-label="Search products"
+          className="w-full border-b border-neutral-300 bg-transparent py-3 pl-8 text-2xl font-light tracking-tight text-neutral-900 outline-none placeholder:text-neutral-300 focus:border-neutral-900"
+        />
+      </form>
+
+      <p className="mt-6 text-sm text-neutral-500">
+        {term ? <>Results for &ldquo;{term}&rdquo; · </> : "All products · "}
         {results.length} product{results.length === 1 ? "" : "s"}
       </p>
 
@@ -28,7 +36,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           action={{ href: "/search", label: "See all products" }}
         />
       ) : (
-        <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
+        <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4">
           {results.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}

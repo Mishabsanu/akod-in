@@ -4,7 +4,21 @@
 // categories and products with "Show on storefront" switched on appear here.
 // Server-side only: never import this file from a "use client" component.
 // ------------------------------------------------------------------
+import { existsSync } from "node:fs";
+import path from "node:path";
 import { cache } from "react";
+
+/**
+ * Local photo fallback: public/products/<product-slug>.(png|webp|jpg|jpeg), used when the product
+ * has no photo in AKOD ECO. Photos uploaded in AKOD ECO always win.
+ */
+const LOCAL_EXTS = ["png", "webp", "jpg", "jpeg"];
+function localPhoto(slug: string): string | undefined {
+  for (const ext of LOCAL_EXTS) {
+    if (existsSync(path.join(process.cwd(), "public", "products", `${slug}.${ext}`))) return `/products/${slug}.${ext}`;
+  }
+  return undefined;
+}
 
 export type Category = {
   slug: string;
@@ -100,11 +114,13 @@ export const getCatalog = cache(async () => {
 
   const products: Product[] = data.products.map((p) => {
     const cat = catBySlug.get(p.category);
+    const local = p.images.length ? undefined : localPhoto(p.slug);
     return {
       ...p,
+      images: local ? [local] : p.images,
       categoryName: cat?.name ?? displayName(p.categoryName),
       tone: cat?.tone ?? "bg-stone-100",
-      image: p.images[0],
+      image: p.images[0] ?? local,
       description: p.description || p.summary,
     };
   });

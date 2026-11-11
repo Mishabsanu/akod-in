@@ -36,7 +36,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   ];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
+    <div className="mx-auto max-w-[1440px] px-6 py-8 sm:px-10">
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
@@ -50,17 +50,17 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
         <div className="md:pt-4">
           {product.categoryName && (
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">{product.categoryName}</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-neutral-400">{product.categoryName}</p>
           )}
-          <h1 className="mt-2 font-display text-3xl font-semibold leading-tight text-ink sm:text-4xl">{product.name}</h1>
+          <h1 className="mt-2 text-3xl font-light leading-tight tracking-tight text-neutral-900 sm:text-4xl">{product.name}</h1>
           {product.summary && <p className="mt-3 text-muted">{product.summary}</p>}
 
           <VariantPicker product={product} />
 
-          <ul className="mt-8 grid gap-3 rounded-2xl bg-cream p-5 sm:grid-cols-2">
+          <ul className="mt-8 grid gap-3 rounded-md bg-[#f5f5f3] p-5 sm:grid-cols-2">
             {perks.map(({ icon: Icon, text }) => (
               <li key={text} className="flex items-center gap-3 text-sm text-ink/85">
-                <Icon className="h-4 w-4 shrink-0 text-leaf" />
+                <Icon className="h-4 w-4 shrink-0 text-neutral-900" />
                 {text}
               </li>
             ))}
@@ -90,7 +90,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       {related.length > 0 && (
         <section className="mt-20">
           <SectionHeading eyebrow="More to try" title="You may also like" href={`/category/${product.category}`} />
-          <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
+          <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}

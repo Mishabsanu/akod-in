@@ -18,11 +18,11 @@ export default function VariantPicker({ product }: { product: Product }) {
   return (
     <>
       <div className="mt-6 flex flex-wrap items-center gap-3">
-        <span className="text-3xl font-bold text-ink">{formatPrice(price)}</span>
+        <span className="text-2xl font-normal text-neutral-900">{formatPrice(price)}</span>
         {off > 0 && (
           <>
             <span className="text-lg text-muted line-through">{formatPrice(mrp)}</span>
-            <span className="rounded-full bg-brand-soft px-3 py-1 text-sm font-bold text-brand">Save {off}%</span>
+            <span className="rounded-full bg-brand-soft px-3 py-1 text-sm font-medium text-brand">Save {off}%</span>
           </>
         )}
       </div>
@@ -42,11 +42,11 @@ export default function VariantPicker({ product }: { product: Product }) {
                   type="button"
                   onClick={() => setSelected(v.id)}
                   aria-pressed={active}
-                  className={`min-w-20 rounded-xl border px-4 py-2.5 text-left text-sm transition ${
-                    active ? "border-brand bg-brand-soft ring-1 ring-brand" : "border-line bg-white hover:border-ink/40"
+                  className={`min-w-20 rounded-md border px-4 py-2.5 text-left text-sm transition ${
+                    active ? "border-neutral-900 bg-white ring-1 ring-neutral-900" : "border-line bg-white hover:border-ink/40"
                   } ${v.inStock ? "" : "opacity-60"}`}
                 >
-                  <span className={`block font-semibold ${active ? "text-brand" : "text-ink"}`}>{v.name}</span>
+                  <span className={`block font-semibold ${"text-neutral-900"}`}>{v.name}</span>
                   <span className="block text-xs text-muted">{v.inStock ? formatPrice(v.price) : "Out of stock"}</span>
                 </button>
               );

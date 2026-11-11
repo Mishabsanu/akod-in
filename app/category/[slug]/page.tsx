@@ -51,17 +51,17 @@ export default async function CategoryPage({
 
   return (
     <>
-      <section className="border-b border-line bg-cream">
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:py-14">
+      <section className="border-b border-neutral-200 bg-white">
+        <div className="mx-auto max-w-[1440px] px-6 py-10 sm:px-10 sm:py-14">
           <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: cat.name }]} />
-          <h1 className="mt-4 font-display text-4xl font-semibold text-ink sm:text-5xl">{cat.name}</h1>
+          <h1 className="mt-4 text-4xl font-light tracking-tight text-neutral-900 sm:text-5xl">{cat.name}</h1>
           <p className="mt-3 max-w-2xl text-muted">
             {cat.tagline || `${cat.productCount} natural product${cat.productCount === 1 ? "" : "s"}, packed fresh.`}
           </p>
         </div>
       </section>
 
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-10 lg:grid-cols-[220px_1fr]">
+      <div className="mx-auto grid max-w-[1440px] gap-10 px-6 py-10 sm:px-10 lg:grid-cols-[220px_1fr]">
         {/* Sidebar */}
         <aside className="hidden lg:block">
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">Categories</h2>
@@ -71,7 +71,7 @@ export default async function CategoryPage({
                 <Link
                   href={`/category/${c.slug}`}
                   className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-sm transition ${
-                    c.slug === slug ? "bg-brand-soft font-semibold text-brand" : "text-ink/80 hover:bg-cream"
+                    c.slug === slug ? "bg-neutral-100 font-medium text-neutral-900" : "text-ink/80 hover:bg-cream"
                   }`}
                 >
                   {c.name}
@@ -90,7 +90,7 @@ export default async function CategoryPage({
                 key={c.slug}
                 href={`/category/${c.slug}`}
                 className={`shrink-0 rounded-full border px-4 py-2 text-sm ${
-                  c.slug === slug ? "border-brand bg-brand text-white" : "border-line bg-white text-ink"
+                  c.slug === slug ? "border-neutral-900 bg-neutral-900 text-white" : "border-line bg-white text-ink"
                 }`}
               >
                 {c.name}
@@ -105,11 +105,11 @@ export default async function CategoryPage({
               </p>
               <Link
                 href={href({ stock: stock === "1" ? "" : "1" })}
-                className={`flex items-center gap-2 text-sm ${stock === "1" ? "text-brand" : "text-ink/80 hover:text-ink"}`}
+                className={`flex items-center gap-2 text-sm ${stock === "1" ? "text-neutral-900" : "text-ink/80 hover:text-ink"}`}
               >
                 <span
                   className={`flex h-4 w-4 items-center justify-center rounded border ${
-                    stock === "1" ? "border-brand bg-brand text-white" : "border-ink/30"
+                    stock === "1" ? "border-neutral-900 bg-neutral-900 text-white" : "border-ink/30"
                   }`}
                 >
                   {stock === "1" && <span className="h-1.5 w-1.5 rounded-sm bg-white" />}
@@ -135,7 +135,7 @@ export default async function CategoryPage({
           {list.length === 0 ? (
             <EmptyState icon={PackageOpen} title="Nothing here right now" text="Try turning off “In stock only”." />
           ) : (
-            <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3">
               {list.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}

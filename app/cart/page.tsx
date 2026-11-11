@@ -31,7 +31,7 @@ export default function CartPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-10">
       <div className="flex items-end justify-between">
-        <h1 className="font-display text-3xl font-semibold text-ink">Your cart</h1>
+        <h1 className="text-3xl font-light tracking-tight text-neutral-900">Your cart</h1>
         <button onClick={clear} className="text-sm text-muted hover:text-brand">
           Clear cart
         </button>
@@ -41,11 +41,11 @@ export default function CartPage() {
       </p>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_380px]">
-        <ul className="divide-y divide-line rounded-2xl border border-line bg-white">
+        <ul className="divide-y divide-line rounded-md border border-neutral-200 bg-white">
           {items.map((item) => (
             <li key={item.id} className="flex gap-4 p-4 sm:p-5">
               <Link href={`/product/${item.slug}`} className="shrink-0">
-                <ProductImage product={item} className="h-24 w-24 rounded-xl" sizes="96px" />
+                <ProductImage product={item} className="h-24 w-24 rounded-md" sizes="96px" mini />
               </Link>
               <div className="flex min-w-0 flex-1 flex-col">
                 <div className="flex items-start justify-between gap-3">
@@ -83,8 +83,8 @@ export default function CartPage() {
           ))}
         </ul>
 
-        <aside className="h-fit rounded-2xl border border-line bg-cream p-6 lg:sticky lg:top-40">
-          <h2 className="font-display text-xl font-semibold text-ink">Order summary</h2>
+        <aside className="h-fit rounded-2xl border border-line bg-[#f5f5f3] p-6 lg:sticky lg:top-40">
+          <h2 className="text-lg font-medium text-neutral-900">Order summary</h2>
 
           <div className="mt-5 rounded-xl bg-white p-4">
             <p className="flex items-center gap-2 text-sm text-ink">
@@ -119,7 +119,7 @@ export default function CartPage() {
 
           <button
             onClick={() => alert("Checkout coming soon! Connect your payment gateway here.")}
-            className="mt-6 h-12 w-full rounded-full bg-brand font-semibold text-white transition hover:bg-brand-dark"
+            className="mt-6 h-12 w-full rounded-full bg-neutral-900 font-medium text-white transition hover:bg-neutral-700"
           >
             Proceed to checkout
           </button>
