@@ -8,7 +8,18 @@ import { SITE_URL } from "./site";
 /** AKOD Foods WhatsApp (+91 90746 84488); NEXT_PUBLIC_WHATSAPP_NUMBER overrides it. */
 export const WHATSAPP_NUMBER = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919074684488").replace(/\D/g, "");
 export const CONTACT_PHONE_DISPLAY = "+91 90746 84488";
-export const CONTACT_EMAIL = "support@akodgroup.com";
+/** General contact (footer, Google business info). */
+export const CONTACT_EMAIL = "akodfood@gmail.com";
+/** Support address named in the Shipping, Returns & Privacy policies. */
+export const POLICY_EMAIL = "support@akodgroup.com";
+
+export const ADDRESS_LINES = ["KK Tower, Nallamthanni", "Edakkara Road, Pathiripadam PO", "Malappuram District, Kerala, India"];
+export const ADDRESS = {
+  streetAddress: "KK Tower, Nallamthanni, Edakkara Road, Pathiripadam PO",
+  addressLocality: "Malappuram",
+  addressRegion: "Kerala",
+  addressCountry: "IN",
+};
 
 /** wa.me link with a pre-filled message. */
 export function whatsappLink(text: string): string {

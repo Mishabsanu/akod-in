@@ -2,7 +2,7 @@ import { Mail, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { getCategories } from "@/lib/data";
-import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, GENERAL_MESSAGE, whatsappLink } from "@/lib/whatsapp";
+import { ADDRESS_LINES, CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, GENERAL_MESSAGE, whatsappLink } from "@/lib/whatsapp";
 import { WhatsAppIcon } from "./WhatsApp";
 
 export default async function Footer() {
@@ -69,8 +69,16 @@ export default async function Footer() {
                 Shipping Policy
               </Link>
             </li>
-            <li>Returns &amp; Refunds</li>
-            <li>Privacy Policy</li>
+            <li>
+              <Link href="/returns-refunds" className="transition hover:text-white">
+                Returns &amp; Refunds
+              </Link>
+            </li>
+            <li>
+              <Link href="/privacy-policy" className="transition hover:text-white">
+                Privacy Policy
+              </Link>
+            </li>
           </ul>
         </div>
 
@@ -79,7 +87,14 @@ export default async function Footer() {
           <ul className="space-y-3 text-sm">
             <li className="flex gap-3">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-white" />
-              Kerala, India
+              <address className="not-italic">
+                AKOD Foods
+                {ADDRESS_LINES.map((l) => (
+                  <span key={l} className="block">
+                    {l}
+                  </span>
+                ))}
+              </address>
             </li>
             <li>
               <a href={whatsappLink(GENERAL_MESSAGE)} target="_blank" rel="noopener noreferrer" className="flex gap-3 hover:text-white">

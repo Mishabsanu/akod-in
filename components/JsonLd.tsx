@@ -1,7 +1,7 @@
 import type { Category, Product } from "@/lib/data";
 import { originalPhoto } from "@/lib/cutout";
 import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
-import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
+import { ADDRESS, CONTACT_EMAIL, POLICY_EMAIL, WHATSAPP_NUMBER } from "@/lib/whatsapp";
 
 /** Structured data (schema.org) so Google shows rich results: brand, products, prices, breadcrumbs. */
 export default function JsonLd({ data }: { data: object | object[] }) {
@@ -30,17 +30,19 @@ export const organizationLd = () => ({
   logo: absoluteUrl("/products/logo.jpg"),
   description: SITE_DESCRIPTION,
   slogan: "Best Kerala banana chips, made in God's Own Country",
-  foundingLocation: { "@type": "Place", name: "Kerala, India" },
+  foundingLocation: { "@type": "Place", name: "Malappuram, Kerala, India" },
+  address: { "@type": "PostalAddress", ...ADDRESS },
+  email: CONTACT_EMAIL,
+  telephone: `+${WHATSAPP_NUMBER}`,
   areaServed: { "@type": "Country", name: "India" },
-  ...(WHATSAPP_NUMBER && {
-    contactPoint: {
-      "@type": "ContactPoint",
-      telephone: `+${WHATSAPP_NUMBER}`,
-      contactType: "customer service",
-      areaServed: "IN",
-      availableLanguage: ["English", "Malayalam", "Hindi"],
-    },
-  }),
+  contactPoint: {
+    "@type": "ContactPoint",
+    telephone: `+${WHATSAPP_NUMBER}`,
+    email: POLICY_EMAIL,
+    contactType: "customer service",
+    areaServed: "IN",
+    availableLanguage: ["English", "Malayalam", "Hindi"],
+  },
 });
 
 export const websiteLd = () => ({
