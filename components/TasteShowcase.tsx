@@ -11,7 +11,7 @@ import ProductImage from "./ProductImage";
 
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 const TAU = Math.PI * 2;
-const SPIN_PER_SECOND = TAU / 70; // one slow turn every 70 s
+const STEP_EVERY_MS = 3800; // auto-advance one pack
 const MORPH_MS = 850;
 const r2 = (v: number) => Math.round(v * 100) / 100;
 const r3 = (v: number) => Math.round(v * 1000) / 1000;
@@ -45,20 +45,17 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
   const focus = selected !== null ? (lineup[selected] ?? null) : null;
   const open = focus !== null;
 
-  // Slow auto-spin while browsing (paused on hover, drag, when a pack is open, or reduced motion)
+  // Auto-advance one pack at a time (paused on hover, drag, when a pack is open, or reduced motion)
   useEffect(() => {
     if (open || n < 2) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let raf = 0;
-    let last = performance.now();
-    const tick = (t: number) => {
-      const dt = Math.min(0.05, (t - last) / 1000);
-      last = t;
-      if (!hovering.current && !drag.current) setRot((r) => r + SPIN_PER_SECOND * dt);
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    const t = window.setInterval(() => {
+      if (hovering.current || drag.current) return;
+      setMorphing(true);
+      window.setTimeout(() => setMorphing(false), MORPH_MS);
+      setRot((r) => r - TAU / n);
+    }, STEP_EVERY_MS);
+    return () => window.clearInterval(t);
   }, [open, n]);
 
   const morph = () => {
@@ -137,9 +134,24 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
     if (d.moved) setRot(d.rot + dx * 0.006);
   };
   const endDrag = () => {
+    const d = drag.current;
+    if (d?.moved) {
+      // Snap so a pack faces front
+      morph();
+      setRot((r) => (TAU / n) * Math.round(r / (TAU / n)));
+    }
     // Let the click handler see whether this was a drag
     window.setTimeout(() => (drag.current = null), 0);
   };
+  const step = (dir: 1 | -1) => {
+    morph();
+    setRot((r) => (TAU / n) * Math.round(r / (TAU / n)) - dir * (TAU / n));
+  };
+
+  // The pack currently facing front
+  const front = (((Math.round(-rot / (TAU / n)) % n) + n) % n) as number;
+  const frontProduct = lineup[front];
+  const pad = (v: number) => String(v).padStart(2, "0");
 
   const transition = morphing
     ? `left ${MORPH_MS}ms ${EASE}, bottom ${MORPH_MS}ms ${EASE}, transform ${MORPH_MS}ms ${EASE}, opacity 600ms ease, filter 600ms ease`
@@ -153,7 +165,7 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
     >
       {/* Stage */}
       <div
-        className={`relative h-[72svh] min-h-[520px] touch-pan-y select-none lg:h-[calc(100svh-101px)] lg:min-h-[620px] lg:max-h-[980px] ${
+        className={`relative h-[72svh] min-h-[480px] touch-pan-y select-none [container-type:size] lg:h-[calc(100svh-101px)] lg:min-h-[520px] lg:max-h-[980px] ${
           open ? "" : "cursor-grab active:cursor-grabbing"
         }`}
         onPointerEnter={() => (hovering.current = true)}
@@ -179,9 +191,21 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
           <ArrowLeft className="h-4 w-4" />
         </button>
 
-        {/* Soft floor shadow under the ring */}
+        {/* Studio backdrop: soft grey floor fading to white */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(130%_60%_at_50%_100%,#ececec_0%,#f6f6f6_40%,#ffffff_75%)]" />
+
+        {/* Giant brand lettering behind the packs */}
         <div
-          className={`pointer-events-none absolute bottom-[14%] h-[42%] rounded-[50%] bg-[radial-gradient(closest-side,rgba(0,0,0,0.035),transparent)] transition-opacity duration-500 ${
+          aria-hidden
+          className="pointer-events-none absolute top-[4%] select-none whitespace-nowrap font-black leading-none tracking-[-0.06em] text-neutral-900/[0.045] transition-all duration-700"
+          style={{ left: "calc(var(--stage) * 0.5)", transform: "translateX(-50%)", fontSize: open ? "19cqw" : "26cqw" }}
+        >
+          AKOD
+        </div>
+
+        {/* Soft shadow under the ring */}
+        <div
+          className={`pointer-events-none absolute bottom-[16%] h-[40%] rounded-[50%] bg-[radial-gradient(closest-side,rgba(0,0,0,0.05),transparent)] transition-opacity duration-500 ${
             open ? "opacity-0" : "opacity-100"
           }`}
           style={{ left: "calc(var(--stage) * 0.5)", width: "calc(var(--stage) * 0.84)", transform: "translateX(-50%)" }}
@@ -197,7 +221,7 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
 
           // Rounded so server and browser render identical styles
           let fracX = r4(0.5 + x * 0.36);
-          let bottom = r2(17 + (1 - depth) * 33);
+          let bottom = r2(21 + (1 - depth) * 30);
           let scale = r3(0.45 + 0.55 * depth);
           let opacity = r3(0.35 + 0.65 * depth);
           let blur = r2((1 - depth) * 5);
@@ -205,7 +229,7 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
 
           if (open && active) {
             fracX = 0.5;
-            bottom = 14;
+            bottom = 16;
             scale = 1.55;
             opacity = 1;
             blur = 0;
@@ -216,8 +240,6 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
             blur = 16;
           }
 
-          const showLabel = !open && z > 0.8;
-
           return (
             <button
               key={p.id}
@@ -227,7 +249,7 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
               }}
               tabIndex={open ? (active ? 0 : -1) : z > 0.3 ? 0 : -1}
               aria-label={active ? "Back to all products" : `Take a closer look at ${p.name}`}
-              className={`group absolute w-[28vw] origin-bottom sm:w-[min(17vw,270px)] outline-none ${open && !active ? "pointer-events-none" : ""}`}
+              className={`group absolute w-[min(28vw,34cqh)] origin-bottom sm:w-[min(17vw,270px,34cqh)] outline-none ${open && !active ? "pointer-events-none" : ""}`}
               style={{
                 left: `calc(var(--stage) * ${fracX})`,
                 bottom: `${bottom}%`,
@@ -243,13 +265,6 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
                   <ProductImage product={p} bare className="aspect-[3/4] w-full" sizes="(max-width: 1024px) 50vw, 420px" priority={z > 0.6} />
                 </div>
               </div>
-              <span
-                className={`absolute left-1/2 top-full mt-3 w-[180%] -translate-x-1/2 text-center text-[13px] text-neutral-600 transition-opacity duration-300 ${
-                  showLabel ? "opacity-100" : "opacity-0"
-                }`}
-              >
-                {p.name}
-              </span>
             </button>
           );
         })}
@@ -265,14 +280,56 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
           </p>
         )}
 
-        {/* Hint */}
-        <p
-          className={`pointer-events-none absolute bottom-5 left-1/2 -translate-x-1/2 text-xs text-neutral-400 transition-opacity duration-500 ${
-            open ? "opacity-0" : "opacity-100"
-          }`}
-        >
-          Drag to explore · Tap a pack
-        </p>
+        {/* Bottom bar: counter + front pack, arrows, shop now */}
+        {frontProduct && (
+          <div
+            className={`absolute inset-x-0 bottom-0 z-[250] px-6 pb-6 transition-all duration-500 sm:px-10 ${
+              open ? "pointer-events-none translate-y-4 opacity-0" : "opacity-100"
+            }`}
+          >
+            <div className="flex items-end justify-between gap-6 border-t border-neutral-900/10 pt-5">
+              <div key={frontProduct.id} className="min-w-0 flex-1 animate-[fadeUp_500ms_ease_both]">
+                <p className="font-mono text-[11px] tracking-[0.2em] text-neutral-400">
+                  <span className="text-neutral-900">{pad(front + 1)}</span> / {pad(n)} · {frontProduct.categoryName}
+                </p>
+                <p className="mt-1 truncate text-lg font-light tracking-tight text-neutral-900 sm:text-xl">{frontProduct.name}</p>
+                <p className="text-[13px] text-neutral-500">
+                  {frontProduct.variants.length > 1 ? "From " : ""}
+                  {formatPrice(frontProduct.price)}
+                  {frontProduct.mrp > frontProduct.price && (
+                    <span className="ml-2 text-neutral-400 line-through">{formatPrice(frontProduct.mrp)}</span>
+                  )}
+                </p>
+              </div>
+
+              <div className="hidden items-center gap-2 sm:flex">
+                <button
+                  onClick={() => step(-1)}
+                  aria-label="Previous product"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-neutral-300 bg-white text-neutral-900 transition hover:border-neutral-900 hover:bg-neutral-900 hover:text-white"
+                >
+                  <ArrowLeft className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => step(1)}
+                  aria-label="Next product"
+                  className="flex h-11 w-11 items-center justify-center rounded-full border border-neutral-300 bg-white text-neutral-900 transition hover:border-neutral-900 hover:bg-neutral-900 hover:text-white"
+                >
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="flex flex-1 justify-end">
+                <button
+                  onClick={() => choose(front)}
+                  className="inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-full bg-neutral-900 px-6 text-sm font-medium text-white transition hover:bg-neutral-700"
+                >
+                  Shop now <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Side panel: only after a pack is chosen */}
