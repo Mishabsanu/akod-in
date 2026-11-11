@@ -1,13 +1,14 @@
 "use client";
 
-import { ArrowRight, ChevronDown, Menu, Search, ShoppingBag, X } from "lucide-react";
+import { ArrowRight, ChevronDown, Menu, Search, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { formatPrice } from "@/lib/format";
-import { useCart } from "./CartProvider";
+import { GENERAL_MESSAGE, whatsappLink } from "@/lib/whatsapp";
 import ProductImage from "./ProductImage";
+import { WhatsAppIcon } from "./WhatsApp";
 
 export type NavCategory = { slug: string; name: string; productCount: number };
 export type NavProduct = { slug: string; name: string; image?: string; tone: string; price: number; categoryName: string; sizes: number };
@@ -16,12 +17,11 @@ const MESSAGES = ["Free delivery on orders above ₹499", "Crafted in pure cocon
 
 /**
  * Header: rotating message strip, centred logo, Shop mega menu with photos, instant search
- * (/ or Ctrl+K), slide-out cart. Hides while scrolling down, comes back when scrolling up.
+ * (/ or Ctrl+K), WhatsApp chat. Hides while scrolling down, comes back when scrolling up.
  */
 export default function Header({ categories, products }: { categories: NavCategory[]; products: NavProduct[] }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { count, setDrawerOpen } = useCart();
 
   const [msg, setMsg] = useState(0);
   const [scrolled, setScrolled] = useState(false);
@@ -170,7 +170,7 @@ export default function Header({ categories, products }: { categories: NavCatego
           }`}
           onMouseLeave={closeMega}
         >
-          <div className={`mx-auto grid max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center px-4 transition-all duration-300 sm:px-10 ${scrolled ? "h-14" : "h-[68px]"}`}>
+          <div className={`mx-auto grid max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center px-4 transition-all duration-300 sm:px-10 ${scrolled ? "h-[68px]" : "h-[80px] md:h-[104px]"}`}>
             {/* Left: menu (mobile) / nav (desktop) */}
             <div className="flex items-center gap-7">
               <button className={`${iconBtn} md:hidden`} aria-label="Open menu" onClick={() => setMenuOpen(true)}>
@@ -200,13 +200,12 @@ export default function Header({ categories, products }: { categories: NavCatego
                 width={3067}
                 height={2221}
                 priority
-                className={`w-auto transition-all duration-300 ${scrolled ? "h-8" : "h-10"}`}
+                className={`w-auto transition-all duration-300 ${scrolled ? "h-12 md:h-14" : "h-14 md:h-20"}`}
               />
             </Link>
 
-            {/* Right: search + cart */}
+            {/* Right: search + WhatsApp */}
             <div className="flex items-center justify-end gap-1 sm:gap-2">
-              <span className="hidden lg:block">{navLink("/#bulk", "Bulk Orders")}</span>
               <button
                 onClick={() => setSearchOpen(true)}
                 className="hidden h-10 items-center gap-3 rounded-full border border-neutral-200 pl-4 pr-2 text-[13px] text-neutral-500 transition hover:border-neutral-900 hover:text-neutral-900 md:flex lg:ml-4"
@@ -218,17 +217,23 @@ export default function Header({ categories, products }: { categories: NavCatego
               <button className={`${iconBtn} md:hidden`} aria-label="Search" onClick={() => setSearchOpen(true)}>
                 <Search className="h-5 w-5" strokeWidth={1.6} />
               </button>
-              <button className={iconBtn} aria-label={`Open cart, ${count} items`} onClick={() => setDrawerOpen(true)}>
-                <ShoppingBag className="h-5 w-5" strokeWidth={1.6} />
-                {count > 0 && (
-                  <span
-                    key={count}
-                    className="absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] animate-[pop_400ms_ease] items-center justify-center rounded-full bg-neutral-900 px-1 text-[10px] font-semibold text-white"
-                  >
-                    {count}
-                  </span>
-                )}
-              </button>
+              <a
+                href={whatsappLink(GENERAL_MESSAGE)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden h-10 items-center gap-2 rounded-full bg-neutral-900 px-4 text-[13px] font-medium text-white transition hover:bg-neutral-700 sm:flex"
+              >
+                <WhatsAppIcon className="h-4 w-4" /> Chat with us
+              </a>
+              <a
+                href={whatsappLink(GENERAL_MESSAGE)}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Chat with us on WhatsApp"
+                className={`${iconBtn} sm:hidden`}
+              >
+                <WhatsAppIcon className="h-5 w-5" />
+              </a>
             </div>
           </div>
 
@@ -382,7 +387,7 @@ export default function Header({ categories, products }: { categories: NavCatego
           }`}
         >
           <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
-            <Image src="/products/logo.jpg" alt="AKOD Food" width={3067} height={2221} className="h-8 w-auto" />
+            <Image src="/products/logo.jpg" alt="AKOD Food" width={3067} height={2221} className="h-11 w-auto" />
             <button onClick={() => setMenuOpen(false)} aria-label="Close menu" className={iconBtn}>
               <X className="h-5 w-5" strokeWidth={1.6} />
             </button>
@@ -407,9 +412,14 @@ export default function Header({ categories, products }: { categories: NavCatego
                 </Link>
               </li>
               <li>
-                <Link href="/#bulk" className="block py-4 text-lg font-light text-neutral-900">
-                  Bulk Orders
-                </Link>
+                <a
+                  href={whatsappLink(GENERAL_MESSAGE)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 py-4 text-lg font-light text-neutral-900"
+                >
+                  <WhatsAppIcon className="h-5 w-5" /> Chat on WhatsApp
+                </a>
               </li>
             </ul>
             {featured.length > 0 && (

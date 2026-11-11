@@ -7,6 +7,7 @@
 import { existsSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { cache } from "react";
+import { cutoutUrl } from "./cutout";
 
 /**
  * Local photo fallback: public/products/<product-slug>.(png|webp|jpg|jpeg), used when the product
@@ -135,12 +136,15 @@ export const getCatalog = cache(async () => {
   const products: Product[] = data.products.map((p) => {
     const cat = catBySlug.get(p.category);
     const local = p.images.length ? undefined : (localPhoto(p.slug) ?? pickStandIn(pool, p.slug));
+    // Uploaded photos are served as cut-outs (studio background removed)
+    const images = local ? [local] : p.images.map(cutoutUrl);
     return {
       ...p,
-      images: local ? [local] : p.images,
+      images,
+      variants: p.variants.map((v) => ({ ...v, image: v.image ? cutoutUrl(v.image) : v.image })),
       categoryName: cat?.name ?? displayName(p.categoryName),
       tone: cat?.tone ?? "bg-stone-100",
-      image: p.images[0] ?? local,
+      image: images[0],
       description: p.description || p.summary,
     };
   });

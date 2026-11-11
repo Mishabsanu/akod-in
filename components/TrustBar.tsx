@@ -1,9 +1,9 @@
-import { BadgeCheck, Leaf, ShieldCheck, Truck } from "lucide-react";
+import { BadgeCheck, Leaf, MessageCircle, Truck } from "lucide-react";
 
 const ITEMS = [
   { icon: Leaf, title: "100% natural", text: "No preservatives or colours" },
   { icon: Truck, title: "Free delivery", text: "On orders above ₹499" },
-  { icon: ShieldCheck, title: "Secure payments", text: "UPI, cards & net banking" },
+  { icon: MessageCircle, title: "Order on WhatsApp", text: "Quick replies, easy ordering" },
   { icon: BadgeCheck, title: "Made in coconut oil", text: "Packed fresh in small batches" },
 ];
 

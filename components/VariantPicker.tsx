@@ -4,9 +4,10 @@ import { useState } from "react";
 import { cartLineFor } from "@/lib/cart";
 import type { Product } from "@/lib/data";
 import { discountPercent, formatPrice } from "@/lib/format";
-import AddToCartButton from "./AddToCartButton";
+import { orderMessage } from "@/lib/whatsapp";
+import { WhatsAppButton } from "./WhatsApp";
 
-/** Price, size choice and Add to Cart on the product page. */
+/** Price, size choice and Order on WhatsApp on the product page. */
 export default function VariantPicker({ product }: { product: Product }) {
   const [selected, setSelected] = useState(() => cartLineFor(product).line.id);
   const { line, inStock } = cartLineFor(product, selected);
@@ -56,7 +57,14 @@ export default function VariantPicker({ product }: { product: Product }) {
       )}
 
       <div className="mt-8 max-w-sm">
-        <AddToCartButton line={line} inStock={inStock} large />
+        <WhatsAppButton
+          text={orderMessage(product, line.variant, line.price)}
+          label={inStock ? "Order on WhatsApp" : "Out of stock"}
+          disabled={!inStock}
+          size="lg"
+          className="w-full"
+        />
+        <p className="mt-3 text-center text-xs text-neutral-500">We reply on WhatsApp to confirm your order and delivery.</p>
       </div>
     </>
   );

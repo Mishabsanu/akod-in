@@ -1,12 +1,13 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Check, Plus, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { cartLineFor } from "@/lib/cart";
 import type { Product } from "@/lib/data";
 import { discountPercent, formatPrice } from "@/lib/format";
-import { useCart } from "./CartProvider";
+import { orderMessage, whatsappLink } from "@/lib/whatsapp";
+import { WhatsAppButton, WhatsAppIcon } from "./WhatsApp";
 import ProductImage from "./ProductImage";
 
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
@@ -24,18 +25,22 @@ const nearest = (from: number, target: number) => target + Math.round((from - ta
  * Hero: every product stands on a slowly turning ring. Front packs are large and sharp,
  * packs at the back are small, faded and blurred. Drag to spin.
  * Tap a pack: it comes to the front, the others blur away, and the side panel slides in
- * with its pack sizes (variants), add to cart and pairings.
+ * with its pack sizes (variants), Order on WhatsApp and pairings.
  */
 export default function TasteShowcase({ products }: { products: Product[] }) {
-  const lineup = products;
+  // A few products alone look lost on the ring: repeat them until there are at least 6 slots
+  const realN = products.length;
+  const lineup = useMemo(() => {
+    if (realN === 0 || realN >= 6) return products;
+    const times = Math.ceil(6 / realN);
+    return Array.from({ length: realN * times }, (_, i) => products[i % realN]);
+  }, [products, realN]);
   const n = lineup.length;
 
   const [rot, setRot] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [morphing, setMorphing] = useState(false);
   const [variantId, setVariantId] = useState<string | undefined>();
-  const [added, setAdded] = useState<"one" | "box" | null>(null);
-  const { add, items } = useCart();
 
   const hovering = useRef(false);
   const drag = useRef<{ x: number; rot: number; moved: boolean } | null>(null);
@@ -65,7 +70,6 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
 
   const choose = useCallback(
     (i: number | null) => {
-      setAdded(null);
       setMorphing(true);
       window.setTimeout(() => setMorphing(false), MORPH_MS);
       if (i !== null) {
@@ -114,12 +118,12 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
   const off = discountPercent(price, mrp);
   const boxLines = current ? [current, ...pairings].filter((b) => b.inStock) : [];
   const boxTotal = boxLines.reduce((s, b) => s + b.line.price, 0);
-  const inCart = current ? (items.find((i) => i.id === current.line.id)?.qty ?? 0) : 0;
-
-  const flash = (kind: "one" | "box") => {
-    setAdded(kind);
-    setTimeout(() => setAdded(null), 2000);
-  };
+  const boxMessage = focus
+    ? `Hi AKOD! I'd like to order:\n${[{ product: focus, ...current! }, ...pairings]
+        .filter((b) => b.inStock)
+        .map((b) => `• ${b.product.name} (${b.line.variant}) – ${formatPrice(b.line.price)}`)
+        .join("\n")}\nTotal: ${formatPrice(boxTotal)}`
+    : "";
 
   // Drag to spin
   const onPointerDown = (e: React.PointerEvent) => {
@@ -165,7 +169,7 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
     >
       {/* Stage */}
       <div
-        className={`relative h-[72svh] min-h-[480px] touch-pan-y select-none [container-type:size] lg:h-[calc(100svh-101px)] lg:min-h-[520px] lg:max-h-[980px] ${
+        className={`relative h-[72svh] min-h-[480px] touch-pan-y select-none [container-type:size] lg:h-[calc(100svh-137px)] lg:min-h-[520px] lg:max-h-[980px] ${
           open ? "" : "cursor-grab active:cursor-grabbing"
         }`}
         onPointerEnter={() => (hovering.current = true)}
@@ -242,7 +246,7 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
 
           return (
             <button
-              key={p.id}
+              key={`${p.id}-${i}`}
               onClick={() => {
                 if (drag.current?.moved) return;
                 choose(active ? null : i);
@@ -283,14 +287,14 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
         {/* Bottom bar: counter + front pack, arrows, shop now */}
         {frontProduct && (
           <div
-            className={`absolute inset-x-0 bottom-0 z-[250] px-6 pb-6 transition-all duration-500 sm:px-10 ${
+            className={`absolute inset-x-0 bottom-0 z-[250] px-6 pb-6 pr-24 transition-all duration-500 sm:px-10 sm:pr-28 ${
               open ? "pointer-events-none translate-y-4 opacity-0" : "opacity-100"
             }`}
           >
             <div className="flex items-end justify-between gap-6 border-t border-neutral-900/10 pt-5">
               <div key={frontProduct.id} className="min-w-0 flex-1 animate-[fadeUp_500ms_ease_both]">
                 <p className="font-mono text-[11px] tracking-[0.2em] text-neutral-400">
-                  <span className="text-neutral-900">{pad(front + 1)}</span> / {pad(n)} · {frontProduct.categoryName}
+                  <span className="text-neutral-900">{pad((front % realN) + 1)}</span> / {pad(realN)} · {frontProduct.categoryName}
                 </p>
                 <p className="mt-1 truncate text-lg font-light tracking-tight text-neutral-900 sm:text-xl">{frontProduct.name}</p>
                 <p className="text-[13px] text-neutral-500">
@@ -400,24 +404,12 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
               </div>
             )}
 
-            <button
-              onClick={() => {
-                add(current.line);
-                flash("one");
-              }}
+            <WhatsAppButton
+              text={orderMessage(focus, current.line.variant, current.line.price)}
+              label={current.inStock ? `Order ${current.line.variant} on WhatsApp` : "Out of stock"}
               disabled={!current.inStock}
-              className="mt-6 flex h-12 w-full shrink-0 animate-[fadeUp_600ms_ease_380ms_both] items-center justify-center gap-2 rounded-full bg-neutral-900 text-sm font-medium text-white transition hover:bg-neutral-700 disabled:cursor-not-allowed disabled:bg-neutral-200 disabled:text-neutral-500"
-            >
-              {added === "one" ? (
-                <>
-                  <Check className="h-4 w-4" /> Added{inCart > 1 ? ` · ${inCart} in cart` : ""}
-                </>
-              ) : current.inStock ? (
-                <>Add to cart{inCart > 0 ? ` · ${inCart} in cart` : ""}</>
-              ) : (
-                "Out of stock"
-              )}
-            </button>
+              className="mt-6 w-full shrink-0 animate-[fadeUp_600ms_ease_380ms_both]"
+            />
             <Link
               href={`/product/${focus.slug}`}
               className="mt-3 text-center text-[13px] text-neutral-500 underline-offset-4 hover:text-neutral-900 hover:underline"
@@ -444,13 +436,15 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
                         </p>
                       </div>
                       {inStock && (
-                        <button
-                          onClick={() => add(line)}
-                          aria-label={`Add ${p.name}`}
+                        <a
+                          href={whatsappLink(orderMessage(p, line.variant, line.price))}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Order ${p.name} on WhatsApp`}
                           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-neutral-300 text-neutral-700 transition hover:border-neutral-900 hover:bg-neutral-900 hover:text-white"
                         >
-                          <Plus className="h-4 w-4" />
-                        </button>
+                          <WhatsAppIcon className="h-4 w-4" />
+                        </a>
                       )}
                     </li>
                   ))}
@@ -458,31 +452,16 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
               </div>
             )}
 
-            {/* Whole box */}
-            <div className="mt-auto pt-6">
-              <div className="flex items-baseline justify-between border-t border-neutral-200 pt-4 text-sm">
-                <span className="text-neutral-500">Full box · {boxLines.length} items</span>
-                <span className="text-neutral-900">{formatPrice(boxTotal)}</span>
+            {/* Whole box in one message */}
+            {boxLines.length > 1 && (
+              <div className="mt-auto pt-6">
+                <div className="flex items-baseline justify-between border-t border-neutral-200 pt-4 text-sm">
+                  <span className="text-neutral-500">All {boxLines.length} together</span>
+                  <span className="text-neutral-900">{formatPrice(boxTotal)}</span>
+                </div>
+                <WhatsAppButton text={boxMessage} label={`Order all ${boxLines.length} on WhatsApp`} variant="outline" className="mt-3 w-full" />
               </div>
-              <button
-                onClick={() => {
-                  boxLines.forEach((b) => add(b.line));
-                  flash("box");
-                }}
-                disabled={boxLines.length === 0}
-                className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-full border border-neutral-900 text-sm font-medium text-neutral-900 transition hover:bg-neutral-900 hover:text-white disabled:cursor-not-allowed disabled:border-neutral-200 disabled:text-neutral-400 disabled:hover:bg-transparent"
-              >
-                {added === "box" ? (
-                  <>
-                    <Check className="h-4 w-4" /> Box added
-                  </>
-                ) : (
-                  <>
-                    Add full box to cart <ArrowRight className="h-4 w-4" />
-                  </>
-                )}
-              </button>
-            </div>
+            )}
           </div>
         )}
       </aside>

@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
-import CartDrawer from "@/components/CartDrawer";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { CartProvider } from "@/components/CartProvider";
+import { WhatsAppFloat } from "@/components/WhatsApp";
 import { getCatalog } from "@/lib/data";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -32,12 +31,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
       <body className="font-sans antialiased">
-        <CartProvider>
           <Header categories={navCategories} products={navProducts} />
           <main className="min-h-[60vh]">{children}</main>
           <Footer />
-          <CartDrawer />
-        </CartProvider>
+          <WhatsAppFloat />
       </body>
     </html>
   );

@@ -1,12 +1,13 @@
-import { ArrowRight, Store } from "lucide-react";
-import Link from "next/link";
+import { Store } from "lucide-react";
 import CategoryGrid from "@/components/CategoryGrid";
 import EmptyState from "@/components/EmptyState";
 import ProductCard from "@/components/ProductCard";
 import SectionHeading from "@/components/SectionHeading";
 import TasteShowcase from "@/components/TasteShowcase";
 import TrustBar from "@/components/TrustBar";
+import { WhatsAppButton } from "@/components/WhatsApp";
 import { getCatalog } from "@/lib/data";
+import { GENERAL_MESSAGE } from "@/lib/whatsapp";
 
 export const revalidate = 60;
 
@@ -68,21 +69,32 @@ export default async function Home() {
         );
       })}
 
-      {/* Bulk orders */}
-      <section id="bulk" className={`${WRAP} scroll-mt-24 pt-24`}>
-        <div className="flex flex-col items-start justify-between gap-6 rounded-md bg-[#f5f5f3] px-8 py-12 sm:px-12 md:flex-row md:items-center">
-          <div className="max-w-xl">
-            <h2 className="text-2xl font-light tracking-tight text-neutral-900 sm:text-3xl">Ordering in bulk?</h2>
-            <p className="mt-2 text-sm text-neutral-500">
-              Special prices for retail stores, corporate gifting, weddings and festivals.
+      {/* How ordering works: WhatsApp */}
+      <section id="order" className={`${WRAP} scroll-mt-24 pt-24`}>
+        <div className="grid gap-10 rounded-2xl bg-neutral-950 px-8 py-12 text-white sm:px-12 md:grid-cols-[1.2fr_1fr] md:items-center">
+          <div>
+            <p className="font-mono text-[11px] tracking-[0.2em] text-white/50">HOW TO ORDER</p>
+            <h2 className="mt-3 text-3xl font-light tracking-tight sm:text-4xl">Order in a quick WhatsApp chat.</h2>
+            <p className="mt-3 max-w-md text-sm leading-relaxed text-white/60">
+              Pick your packs, tap Order on WhatsApp, and we&apos;ll confirm your order, delivery and payment right in the chat.
             </p>
+            <WhatsAppButton text={GENERAL_MESSAGE} label="Chat with us" className="mt-7 bg-white !text-neutral-900 hover:!bg-neutral-200" />
           </div>
-          <Link
-            href="#contact"
-            className="inline-flex h-12 items-center gap-2 rounded-full bg-neutral-900 px-7 text-sm font-medium text-white transition hover:bg-neutral-700"
-          >
-            Contact us <ArrowRight className="h-4 w-4" />
-          </Link>
+          <ol className="space-y-5">
+            {[
+              ["01", "Choose a pack", "Browse and pick the size you want."],
+              ["02", "Tap Order on WhatsApp", "Your order is written for you."],
+              ["03", "We confirm & deliver", "We reply quickly with the total and delivery time."],
+            ].map(([n, t, d]) => (
+              <li key={n} className="flex gap-4 border-t border-white/10 pt-5 first:border-0 first:pt-0">
+                <span className="font-mono text-xs text-white/40">{n}</span>
+                <div>
+                  <p className="text-sm font-medium">{t}</p>
+                  <p className="mt-0.5 text-[13px] text-white/50">{d}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
     </>

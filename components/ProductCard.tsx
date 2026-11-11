@@ -2,10 +2,11 @@ import Link from "next/link";
 import { cartLineFor } from "@/lib/cart";
 import type { Product } from "@/lib/data";
 import { discountPercent, formatPrice } from "@/lib/format";
-import AddToCartButton from "./AddToCartButton";
+import { orderMessage, whatsappLink } from "@/lib/whatsapp";
 import ProductImage from "./ProductImage";
+import { WhatsAppIcon } from "./WhatsApp";
 
-/** Minimal card: product on a light stage, text below, quick add on the image. */
+/** Minimal card: product on a light stage, text below, quick WhatsApp order on the image. */
 export default function ProductCard({ product }: { product: Product }) {
   const off = discountPercent(product.price, product.mrp);
   const { line, inStock } = cartLineFor(product);
@@ -20,9 +21,18 @@ export default function ProductCard({ product }: { product: Product }) {
         {off > 0 && (
           <span className="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-brand">{off}% off</span>
         )}
-        <div className="absolute bottom-3 right-3">
-          <AddToCartButton line={line} inStock={inStock} compact />
-        </div>
+        {inStock && (
+          <a
+            href={whatsappLink(orderMessage(product, line.variant, line.price))}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Order ${product.name} on WhatsApp`}
+            title="Order on WhatsApp"
+            className="absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-white text-neutral-900 shadow-md transition hover:bg-neutral-900 hover:text-white"
+          >
+            <WhatsAppIcon className="h-[18px] w-[18px]" />
+          </a>
+        )}
       </div>
 
       <Link href={`/product/${product.slug}`} className="mt-3 block">
