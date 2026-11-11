@@ -10,8 +10,7 @@ export type CartLine = {
   variant: string; // weight / variant label
   price: number;
   image?: string;
-  emoji: string;
-  color: string;
+  tone: string;
 };
 
 export type CartItem = CartLine & { qty: number };

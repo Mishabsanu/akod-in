@@ -1,105 +1,96 @@
+import { ArrowRight, Store } from "lucide-react";
 import Link from "next/link";
-import CategoryCircles from "@/components/CategoryCircles";
-import HeroSlider from "@/components/HeroSlider";
+import CategoryGrid from "@/components/CategoryGrid";
+import EmptyState from "@/components/EmptyState";
+import Hero from "@/components/Hero";
 import ProductCard from "@/components/ProductCard";
+import SectionHeading from "@/components/SectionHeading";
+import TrustBar from "@/components/TrustBar";
 import { getCatalog } from "@/lib/data";
 
 export const revalidate = 60;
 
+const GRID = "grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:grid-cols-4";
+
 export default async function Home() {
   const { categories, products } = await getCatalog();
-  const best = products.filter((p) => p.bestSeller);
-  const byCategory = (slug: string) => products.filter((p) => p.category === slug);
 
   if (products.length === 0) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-24 text-center">
-        <div className="text-7xl">🛍️</div>
-        <h1 className="mt-4 text-2xl font-bold">Our store is getting ready</h1>
-        <p className="mt-2 text-neutral-500">Products will appear here soon. Please check back shortly.</p>
-      </div>
+      <EmptyState
+        icon={Store}
+        title="Our store is getting ready"
+        text="We're stocking the shelves. Fresh products will appear here very soon."
+      />
     );
   }
 
+  const best = products.filter((p) => p.bestSeller).slice(0, 8);
+  const byCategory = (slug: string) => products.filter((p) => p.category === slug);
+
   return (
     <>
-      <CategoryCircles categories={categories} />
-      <HeroSlider categories={categories} />
+      <Hero products={products} categories={categories} />
+      <TrustBar />
 
-      {/* Trust badges */}
-      <section className="border-b border-neutral-100">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-6 text-center text-sm md:grid-cols-4">
-          {[
-            ["🌱", "100% Natural"],
-            ["🚚", "Free Delivery above ₹499"],
-            ["🔒", "Secure Payments"],
-            ["⭐", "Trusted Quality"],
-          ].map(([icon, label]) => (
-            <div key={label} className="flex items-center justify-center gap-2">
-              <span className="text-2xl">{icon}</span>
-              <span className="font-medium">{label}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Best sellers */}
-      <section className="mx-auto max-w-7xl px-4 pt-12">
-        <h2 className="text-center text-2xl font-bold sm:text-3xl">Best Selling Products</h2>
-        <p className="mt-2 text-center text-neutral-500">Our customers&apos; favourites</p>
-        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-          {best.map((p) => (
-            <ProductCard key={p.slug} product={p} />
-          ))}
-        </div>
-      </section>
-
-      {/* Shop by category tiles */}
-      <section className="mx-auto max-w-7xl px-4 pt-14">
-        <h2 className="text-center text-2xl font-bold sm:text-3xl">Shop By Category</h2>
-        <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-5">
-          {categories.map((c) => (
-            <Link
-              key={c.slug}
-              href={`/category/${c.slug}`}
-              className={`${c.color} group flex flex-col items-center rounded-2xl p-6 text-center transition hover:-translate-y-1 hover:shadow-md`}
-            >
-              {c.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={c.image} alt={c.name} className="h-16 w-16 rounded-full object-cover transition group-hover:scale-110" />
-              ) : (
-                <span className="text-5xl transition group-hover:scale-110">{c.emoji}</span>
-              )}
-              <span className="mt-3 font-semibold">{c.name}</span>
-              <span className="mt-1 text-xs text-neutral-600">{c.tagline}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* One row per category */}
-      {categories.map((c) => (
-        <section key={c.slug} className="mx-auto max-w-7xl px-4 pt-14">
-          <div className="flex items-end justify-between">
-            <div>
-              <h2 className="text-xl font-bold sm:text-2xl">
-                {c.emoji} {c.name}
-              </h2>
-              <p className="text-sm text-neutral-500">{c.tagline}</p>
-            </div>
-            <Link href={`/category/${c.slug}`} className="text-sm font-semibold text-brand hover:underline">
-              View All →
-            </Link>
-          </div>
-          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-            {byCategory(c.slug)
-              .slice(0, 5)
-              .map((p) => (
-                <ProductCard key={p.slug} product={p} />
-              ))}
+      {categories.length > 0 && (
+        <section id="categories" className="mx-auto max-w-7xl scroll-mt-32 px-4 pt-16">
+          <SectionHeading eyebrow="Explore" title="Shop by category" />
+          <div className="mt-8">
+            <CategoryGrid categories={categories} products={products} />
           </div>
         </section>
-      ))}
+      )}
+
+      {best.length > 0 && (
+        <section id="best-sellers" className="mx-auto max-w-7xl scroll-mt-32 px-4 pt-16">
+          <SectionHeading eyebrow="Customer favourites" title="Best sellers" />
+          <div className={`mt-8 ${GRID}`}>
+            {best.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {categories.map((c) => {
+        const list = byCategory(c.slug);
+        if (list.length === 0) return null;
+        return (
+          <section key={c.slug} className="mx-auto max-w-7xl px-4 pt-16">
+            <SectionHeading eyebrow={c.tagline || "Collection"} title={c.name} href={`/category/${c.slug}`} />
+            <div className={`mt-8 ${GRID}`}>
+              {list.slice(0, 4).map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </section>
+        );
+      })}
+
+      {/* Bulk orders */}
+      <section id="bulk" className="mx-auto max-w-7xl scroll-mt-32 px-4 pt-20">
+        <div className="relative overflow-hidden rounded-3xl bg-brand px-6 py-12 text-white sm:px-12">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-white/10" />
+          <div className="pointer-events-none absolute -bottom-20 right-40 h-48 w-48 rounded-full bg-sun/30" />
+          <div className="relative flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
+            <div className="max-w-xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/80">For shops, events &amp; gifting</p>
+              <h2 className="mt-2 font-display text-3xl font-semibold">Ordering in bulk?</h2>
+              <p className="mt-3 text-white/85">
+                Get special prices on large orders for retail stores, corporate gifts, weddings and festivals.
+              </p>
+            </div>
+            <Link
+              href="#contact"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-brand transition hover:bg-cream"
+            >
+              Contact us
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
     </>
   );
 }

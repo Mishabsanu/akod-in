@@ -1,5 +1,8 @@
+import { PackageOpen } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import EmptyState from "@/components/EmptyState";
 import ProductCard from "@/components/ProductCard";
 import { getCategories, getCategory, getProductsByCategory } from "@/lib/data";
 
@@ -11,58 +14,68 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return { title: cat ? `${cat.name} | AKOD Food` : "AKOD Food" };
 }
 
+const SORTS = [
+  ["", "Featured"],
+  ["low", "Price: low to high"],
+  ["high", "Price: high to low"],
+  ["name", "Name A–Z"],
+] as const;
+
 export default async function CategoryPage({
   params,
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ sort?: string }>;
+  searchParams: Promise<{ sort?: string; stock?: string }>;
 }) {
   const { slug } = await params;
-  const { sort } = await searchParams;
+  const { sort = "", stock } = await searchParams;
   const [cat, categories] = await Promise.all([getCategory(slug), getCategories()]);
   if (!cat) notFound();
 
-  const list = [...(await getProductsByCategory(slug))];
+  let list = [...(await getProductsByCategory(slug))];
+  if (stock === "1") list = list.filter((p) => p.inStock);
   if (sort === "low") list.sort((a, b) => a.price - b.price);
   if (sort === "high") list.sort((a, b) => b.price - a.price);
   if (sort === "name") list.sort((a, b) => a.name.localeCompare(b.name));
 
-  const sorts = [
-    ["", "Featured"],
-    ["low", "Price: Low to High"],
-    ["high", "Price: High to Low"],
-    ["name", "Name A–Z"],
-  ];
+  const href = (next: { sort?: string; stock?: string }) => {
+    const q = new URLSearchParams();
+    const s = next.sort ?? sort;
+    const st = next.stock ?? stock;
+    if (s) q.set("sort", s);
+    if (st === "1") q.set("stock", "1");
+    const qs = q.toString();
+    return `/category/${slug}${qs ? `?${qs}` : ""}`;
+  };
 
   return (
     <>
-      <section className={`${cat.color}`}>
-        <div className="mx-auto max-w-7xl px-4 py-10">
-          <nav className="text-sm text-neutral-600">
-            <Link href="/" className="hover:text-brand">Home</Link> / <span>{cat.name}</span>
-          </nav>
-          <h1 className="mt-3 text-3xl font-bold sm:text-4xl">
-            {cat.emoji} {cat.name}
-          </h1>
-          <p className="mt-2 text-neutral-700">{cat.tagline}</p>
+      <section className="border-b border-line bg-cream">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:py-14">
+          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: cat.name }]} />
+          <h1 className="mt-4 font-display text-4xl font-semibold text-ink sm:text-5xl">{cat.name}</h1>
+          <p className="mt-3 max-w-2xl text-muted">
+            {cat.tagline || `${cat.productCount} natural product${cat.productCount === 1 ? "" : "s"}, packed fresh.`}
+          </p>
         </div>
       </section>
 
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 md:grid-cols-[220px_1fr]">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-10 lg:grid-cols-[220px_1fr]">
         {/* Sidebar */}
-        <aside className="hidden md:block">
-          <h3 className="mb-3 font-semibold">Categories</h3>
+        <aside className="hidden lg:block">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">Categories</h2>
           <ul className="space-y-1">
             {categories.map((c) => (
               <li key={c.slug}>
                 <Link
                   href={`/category/${c.slug}`}
-                  className={`block rounded-md px-3 py-2 text-sm ${
-                    c.slug === slug ? "bg-brand text-white" : "hover:bg-cream hover:text-brand"
+                  className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-sm transition ${
+                    c.slug === slug ? "bg-brand-soft font-semibold text-brand" : "text-ink/80 hover:bg-cream"
                   }`}
                 >
-                  {c.emoji} {c.name}
+                  {c.name}
+                  <span className="text-xs text-muted">{c.productCount}</span>
                 </Link>
               </li>
             ))}
@@ -70,15 +83,47 @@ export default async function CategoryPage({
         </aside>
 
         <div>
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-            <p className="text-sm text-neutral-600">{list.length} products</p>
+          {/* Mobile category chips */}
+          <div className="no-scrollbar -mx-4 mb-6 flex gap-2 overflow-x-auto px-4 lg:hidden">
+            {categories.map((c) => (
+              <Link
+                key={c.slug}
+                href={`/category/${c.slug}`}
+                className={`shrink-0 rounded-full border px-4 py-2 text-sm ${
+                  c.slug === slug ? "border-brand bg-brand text-white" : "border-line bg-white text-ink"
+                }`}
+              >
+                {c.name}
+              </Link>
+            ))}
+          </div>
+
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b border-line pb-5">
+            <div className="flex items-center gap-4">
+              <p className="text-sm text-muted">
+                <span className="font-semibold text-ink">{list.length}</span> products
+              </p>
+              <Link
+                href={href({ stock: stock === "1" ? "" : "1" })}
+                className={`flex items-center gap-2 text-sm ${stock === "1" ? "text-brand" : "text-ink/80 hover:text-ink"}`}
+              >
+                <span
+                  className={`flex h-4 w-4 items-center justify-center rounded border ${
+                    stock === "1" ? "border-brand bg-brand text-white" : "border-ink/30"
+                  }`}
+                >
+                  {stock === "1" && <span className="h-1.5 w-1.5 rounded-sm bg-white" />}
+                </span>
+                In stock only
+              </Link>
+            </div>
             <div className="flex flex-wrap gap-2">
-              {sorts.map(([key, label]) => (
+              {SORTS.map(([key, label]) => (
                 <Link
                   key={key}
-                  href={key ? `/category/${slug}?sort=${key}` : `/category/${slug}`}
-                  className={`rounded-full border px-3 py-1 text-xs ${
-                    (sort ?? "") === key ? "border-brand bg-brand text-white" : "border-neutral-300 hover:border-brand"
+                  href={href({ sort: key })}
+                  className={`rounded-full border px-3.5 py-1.5 text-xs font-medium transition ${
+                    sort === key ? "border-ink bg-ink text-white" : "border-line bg-white text-ink/80 hover:border-ink/40"
                   }`}
                 >
                   {label}
@@ -87,11 +132,15 @@ export default async function CategoryPage({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-            {list.map((p) => (
-              <ProductCard key={p.slug} product={p} />
-            ))}
-          </div>
+          {list.length === 0 ? (
+            <EmptyState icon={PackageOpen} title="Nothing here right now" text="Try turning off “In stock only”." />
+          ) : (
+            <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3">
+              {list.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </>

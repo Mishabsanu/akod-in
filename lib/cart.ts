@@ -12,8 +12,7 @@ export function cartLineFor(product: Product, variantId?: string): { line: CartL
       variant: v?.name ?? product.weight,
       price: v?.price ?? product.price,
       image: v?.image ?? product.image,
-      emoji: product.emoji,
-      color: product.color,
+      tone: product.tone,
     },
     inStock: v ? v.inStock : product.inStock,
   };

@@ -2,7 +2,7 @@
 // Store data comes from AKOD ECO (GET /api/storefront/catalog).
 // Products and categories are managed in AKOD ECO → Products. Only active
 // categories and products with "Show on storefront" switched on appear here.
-// Server-only: never import this file from a "use client" component.
+// Server-side only: never import this file from a "use client" component.
 // ------------------------------------------------------------------
 import { cache } from "react";
 
@@ -10,8 +10,7 @@ export type Category = {
   slug: string;
   name: string;
   tagline: string;
-  emoji: string;
-  color: string; // tailwind bg class used for tiles
+  tone: string; // soft tailwind background used when there is no photo
   image: string | null;
   productCount: number;
 };
@@ -36,8 +35,7 @@ export type Product = {
   price: number; // selling price (INR)
   mrp: number; // original price (INR)
   weight: string;
-  emoji: string;
-  color: string;
+  tone: string;
   image?: string;
   images: string[];
   description: string;
@@ -52,29 +50,18 @@ export type Product = {
 };
 
 type ApiCategory = { slug: string; name: string; description: string; image: string | null; productCount: number };
-type ApiProduct = Omit<Product, "emoji" | "color" | "image" | "bestSeller"> & { bestSeller: boolean };
+type ApiProduct = Omit<Product, "tone" | "image" | "bestSeller"> & { bestSeller: boolean };
 type ApiCatalog = { categories: ApiCategory[]; products: ApiProduct[] };
 
 const API_URL = (process.env.AKOD_ECO_API_URL ?? "http://localhost:3000").replace(/\/+$/, "");
 const REVALIDATE_SECONDS = Number(process.env.CATALOG_REVALIDATE_SECONDS) || 60;
 
-// ---- Look & feel: emoji + tile colour picked from the name (AKOD ECO has no such fields) ----
-const COLORS = ["bg-amber-100", "bg-red-100", "bg-orange-100", "bg-lime-100", "bg-yellow-100", "bg-emerald-100", "bg-rose-100", "bg-sky-100"];
+/** Soft backgrounds for photo-less products and categories (literal class names so Tailwind keeps them). */
+const TONES = ["bg-amber-50", "bg-rose-50", "bg-lime-50", "bg-orange-50", "bg-emerald-50", "bg-yellow-50", "bg-stone-100", "bg-red-50"];
 
-const EMOJI_RULES: [RegExp, string][] = [
-  [/banana/, "🍌"], [/jackfruit/, "🍈"], [/tapioca|potato/, "🥔"], [/murukku/, "🌀"], [/mixture|namkeen/, "🥨"],
-  [/pepper/, "⚫"], [/cardamom|elaichi/, "🟢"], [/turmeric|haldi/, "🟡"], [/chil+i|mirch/, "🌶️"], [/masala|salt/, "🧂"],
-  [/coconut/, "🥥"], [/clove/, "🌰"], [/cashew|groundnut|peanut|\bnut/, "🥜"], [/almond|badam/, "🌰"], [/raisin|grape/, "🍇"], [/date/, "🟤"],
-  [/walnut/, "🧠"], [/pistachio/, "🟩"], [/moringa|leaf|herb/, "🌿"], [/ragi|millet|wheat|rice|grain/, "🌾"],
-  [/beetroot/, "🟣"], [/amla|gooseberry/, "🍏"], [/coconut/, "🥥"], [/sesame|gingelly/, "🫘"], [/mustard/, "🟡"],
-  [/honey/, "🍯"], [/tea/, "🍵"], [/coffee/, "☕"], [/sweet|halwa|laddu/, "🍬"], [/pickle/, "🫙"],
-  [/snack|chips/, "🍿"], [/spice/, "🌶️"], [/dry fruit/, "🥜"], [/powder/, "🌿"], [/oil|ghee/, "🫒"],
-];
-
-const pickEmoji = (text: string, fallback: string) => {
-  const t = text.toLowerCase();
-  return EMOJI_RULES.find(([re]) => re.test(t))?.[1] ?? fallback;
-};
+/** "NATURAL OIL" → "Natural Oil"; names already in mixed case are kept as typed. */
+const displayName = (s: string) =>
+  s === s.toUpperCase() ? s.toLowerCase().replace(/(^|[\s&/-])([a-z])/g, (_, a: string, b: string) => a + b.toUpperCase()) : s;
 
 // ---- Fetch ----
 const EMPTY: ApiCatalog = { categories: [], products: [] };
@@ -103,10 +90,9 @@ export const getCatalog = cache(async () => {
     .filter((c) => c.productCount > 0)
     .map((c, i) => ({
       slug: c.slug,
-      name: c.name,
+      name: displayName(c.name),
       tagline: c.description,
-      emoji: pickEmoji(c.name, "🛍️"),
-      color: COLORS[i % COLORS.length],
+      tone: TONES[i % TONES.length],
       image: c.image,
       productCount: c.productCount,
     }));
@@ -116,8 +102,8 @@ export const getCatalog = cache(async () => {
     const cat = catBySlug.get(p.category);
     return {
       ...p,
-      emoji: pickEmoji(p.name, cat?.emoji ?? "🛍️"),
-      color: cat?.color ?? "bg-neutral-100",
+      categoryName: cat?.name ?? displayName(p.categoryName),
+      tone: cat?.tone ?? "bg-stone-100",
       image: p.images[0],
       description: p.description || p.summary,
     };
@@ -131,7 +117,6 @@ export const getProducts = async () => (await getCatalog()).products;
 export const getCategory = async (slug: string) => (await getCategories()).find((c) => c.slug === slug);
 export const getProduct = async (slug: string) => (await getProducts()).find((p) => p.slug === slug);
 export const getProductsByCategory = async (slug: string) => (await getProducts()).filter((p) => p.category === slug);
-export const bestSellers = async () => (await getProducts()).filter((p) => p.bestSeller);
 export const searchProducts = async (q: string) => {
   const term = q.trim().toLowerCase();
   if (!term) return [];

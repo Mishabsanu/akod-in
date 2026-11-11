@@ -1,158 +1,137 @@
 "use client";
 
+import { Leaf, Mail, Menu, Search, ShoppingBag, Truck, User, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import type { Category } from "@/lib/data";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useCart } from "./CartProvider";
 
-export default function Header({ categories }: { categories: Pick<Category, "slug" | "name" | "emoji">[] }) {
+type NavCategory = { slug: string; name: string };
+
+export default function Header({ categories }: { categories: NavCategory[] }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { count } = useCart();
   const [q, setQ] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
-  const [shopOpen, setShopOpen] = useState(false);
+
+  useEffect(() => setMenuOpen(false), [pathname]);
 
   const onSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (q.trim()) router.push(`/search?q=${encodeURIComponent(q.trim())}`);
   };
 
+  const navLink = (href: string, label: string) => {
+    const active = pathname === href;
+    return (
+      <Link
+        key={href}
+        href={href}
+        className={`relative whitespace-nowrap py-3 text-sm font-medium transition-colors ${
+          active ? "text-brand" : "text-ink/80 hover:text-brand"
+        }`}
+      >
+        {label}
+        {active && <span className="absolute inset-x-0 -bottom-px h-0.5 rounded-full bg-brand" />}
+      </Link>
+    );
+  };
+
+  const searchBox = (
+    <form onSubmit={onSearch} role="search" className="relative w-full">
+      <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+      <input
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder="Search snacks, oils, spices…"
+        aria-label="Search products"
+        className="w-full rounded-full border border-line bg-cream py-2.5 pl-11 pr-4 text-sm outline-none transition placeholder:text-muted focus:border-brand focus:bg-white"
+      />
+    </form>
+  );
+
   return (
-    <header className="sticky top-0 z-40 bg-white shadow-sm">
-      {/* Top announcement bar */}
-      <div className="bg-peach text-xs text-neutral-800 sm:text-sm">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2">
-          <p className="truncate">
-            🚚 Free delivery on orders above ₹499 | 100% natural products, no preservatives
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/85">
+      {/* Announcement bar */}
+      <div className="bg-ink text-xs text-white/85">
+        <div className="mx-auto flex max-w-7xl items-center justify-center gap-6 px-4 py-2 sm:justify-between">
+          <p className="flex items-center gap-2">
+            <Truck className="h-3.5 w-3.5 text-sun" />
+            Free delivery on orders above ₹499
           </p>
-          <div className="hidden shrink-0 items-center gap-3 md:flex">
-            <a href="mailto:support@akodfood.com" className="hover:text-brand">
-              ✉ support@akodfood.com
-            </a>
-            <span className="text-neutral-400">|</span>
-            <Link href="/#contact" className="hover:text-brand">
-              Contact Us
+          <p className="hidden items-center gap-2 sm:flex">
+            <Leaf className="h-3.5 w-3.5 text-sun" />
+            100% natural · No preservatives
+          </p>
+          <a href="mailto:support@akodfood.com" className="hidden items-center gap-2 hover:text-white md:flex">
+            <Mail className="h-3.5 w-3.5" />
+            support@akodfood.com
+          </a>
+        </div>
+      </div>
+
+      {/* Main row */}
+      <div className="border-b border-line">
+        <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 md:gap-8">
+          <button
+            className="-ml-1 rounded-full p-2 text-ink hover:bg-cream md:hidden"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+
+          <Link href="/" className="flex shrink-0 items-center" aria-label="AKOD Food home">
+            <Image src="/products/logo.jpg" alt="AKOD Food" width={3067} height={2221} priority className="h-11 w-auto md:h-14" />
+          </Link>
+
+          <div className="hidden max-w-xl flex-1 md:block">{searchBox}</div>
+
+          <div className="ml-auto flex items-center gap-1">
+            <button aria-label="Account" className="rounded-full p-2.5 text-ink hover:bg-cream hover:text-brand">
+              <User className="h-5 w-5" />
+            </button>
+            <Link href="/cart" aria-label={`Cart, ${count} items`} className="relative rounded-full p-2.5 text-ink hover:bg-cream hover:text-brand">
+              <ShoppingBag className="h-5 w-5" />
+              {count > 0 && (
+                <span className="absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold text-white">
+                  {count}
+                </span>
+              )}
             </Link>
           </div>
         </div>
+
+        <div className="px-4 pb-3 md:hidden">{searchBox}</div>
       </div>
-
-      {/* Main header */}
-      <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 md:gap-8 md:py-4">
-        <button
-          className="text-2xl md:hidden"
-          aria-label="Open menu"
-          onClick={() => setMenuOpen((v) => !v)}
-        >
-          ☰
-        </button>
-
-        <Link href="/" className="flex shrink-0 items-center">
-          <Image
-            src="/products/logo.jpg"
-            alt="AKOD Food"
-            width={3067}
-            height={2221}
-            priority
-            className="h-12 w-auto md:h-16"
-          />
-        </Link>
-
-        <form onSubmit={onSearch} className="hidden flex-1 md:flex">
-          <div className="flex w-full items-center rounded-lg bg-neutral-100">
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Search For Anything..."
-              className="w-full bg-transparent px-5 py-3 text-sm outline-none placeholder:text-neutral-500"
-            />
-            <button type="submit" className="border-l border-neutral-200 px-5 text-lg" aria-label="Search">
-              🔍
-            </button>
-          </div>
-        </form>
-
-        <div className="ml-auto flex items-center gap-5 text-xl md:ml-0">
-          <button aria-label="Account" className="hover:text-brand">
-            👤
-          </button>
-          <Link href="/cart" aria-label="Cart" className="relative hover:text-brand">
-            🛒
-            <span className="absolute -right-3 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-600 px-1 text-[11px] font-semibold text-white">
-              {count}
-            </span>
-          </Link>
-        </div>
-      </div>
-
-      {/* Mobile search */}
-      <form onSubmit={onSearch} className="px-4 pb-3 md:hidden">
-        <div className="flex items-center rounded-lg bg-neutral-100">
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search For Anything..."
-            className="w-full bg-transparent px-4 py-2.5 text-sm outline-none"
-          />
-          <button type="submit" className="px-4" aria-label="Search">
-            🔍
-          </button>
-        </div>
-      </form>
 
       {/* Category nav (desktop) */}
-      <nav className="hidden border-t-4 border-brand md:block">
-        <div className="mx-auto flex max-w-7xl items-center gap-8 px-4 py-2 text-[15px]">
-          <div
-            className="relative"
-            onMouseEnter={() => setShopOpen(true)}
-            onMouseLeave={() => setShopOpen(false)}
-          >
-            <button className="flex items-center gap-1 py-1 hover:text-brand">
-              Shop All <span className="text-xs">▼</span>
-            </button>
-            {shopOpen && (
-              <div className="absolute left-0 top-full w-56 rounded-md border border-neutral-100 bg-white py-2 shadow-lg">
-                {categories.map((c) => (
-                  <Link
-                    key={c.slug}
-                    href={`/category/${c.slug}`}
-                    className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-cream hover:text-brand"
-                  >
-                    <span>{c.emoji}</span> {c.name}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-          {categories.map((c) => (
-            <Link key={c.slug} href={`/category/${c.slug}`} className="py-1 hover:text-brand">
-              {c.name}
-            </Link>
-          ))}
-          <Link href="/#contact" className="ml-auto text-sm text-neutral-600 hover:text-brand">
-            Bulk Order
+      <nav className="hidden border-b border-line md:block" aria-label="Categories">
+        <div className="no-scrollbar mx-auto flex max-w-7xl items-center gap-8 overflow-x-auto px-4">
+          {navLink("/", "Home")}
+          {categories.map((c) => navLink(`/category/${c.slug}`, c.name))}
+          <Link href="/#bulk" className="ml-auto whitespace-nowrap py-3 text-sm font-medium text-brand hover:text-brand-dark">
+            Bulk Orders
           </Link>
         </div>
       </nav>
 
       {/* Mobile menu */}
       {menuOpen && (
-        <nav className="border-t-4 border-brand bg-white md:hidden">
-          {categories.map((c) => (
+        <nav className="border-b border-line bg-white md:hidden" aria-label="Menu">
+          {[{ slug: "", name: "Home" }, ...categories].map((c) => (
             <Link
-              key={c.slug}
-              href={`/category/${c.slug}`}
-              onClick={() => setMenuOpen(false)}
-              className="flex items-center gap-3 border-b border-neutral-100 px-5 py-3"
+              key={c.slug || "home"}
+              href={c.slug ? `/category/${c.slug}` : "/"}
+              className="block border-b border-line/70 px-5 py-3.5 text-sm font-medium last:border-0"
             >
-              <span>{c.emoji}</span> {c.name}
+              {c.name}
             </Link>
           ))}
-          <Link href="/#contact" onClick={() => setMenuOpen(false)} className="block px-5 py-3 text-neutral-600">
-            Bulk Order
+          <Link href="/#bulk" className="block px-5 py-3.5 text-sm font-medium text-brand">
+            Bulk Orders
           </Link>
         </nav>
       )}

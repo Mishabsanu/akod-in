@@ -1,7 +1,9 @@
-import Link from "next/link";
+import { Clock, Leaf, RotateCcw, Truck } from "lucide-react";
 import { notFound } from "next/navigation";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import ProductCard from "@/components/ProductCard";
-import ProductImage from "@/components/ProductImage";
+import ProductGallery from "@/components/ProductGallery";
+import SectionHeading from "@/components/SectionHeading";
 import VariantPicker from "@/components/VariantPicker";
 import { getProduct, getProductsByCategory } from "@/lib/data";
 
@@ -10,7 +12,7 @@ export const revalidate = 60;
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const p = await getProduct(slug);
-  return { title: p ? `${p.name} | AKOD Food` : "AKOD Food", description: p?.description };
+  return { title: p ? `${p.name} | AKOD Food` : "AKOD Food", description: p?.summary || p?.description };
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -18,60 +20,79 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const product = await getProduct(slug);
   if (!product) notFound();
 
-  const related = (await getProductsByCategory(product.category))
-    .filter((p) => p.slug !== product.slug)
-    .slice(0, 4);
+  const related = (await getProductsByCategory(product.category)).filter((p) => p.slug !== product.slug).slice(0, 4);
+
+  const details = [
+    ["Ingredients", product.ingredients],
+    ["Shelf life", product.shelfLife],
+    ["SKU", product.sku],
+  ].filter(([, v]) => v);
+
+  const perks = [
+    { icon: Leaf, text: "100% natural, no preservatives" },
+    { icon: Truck, text: product.freeDelivery ? "Free delivery on this product" : "Free delivery on orders above ₹499" },
+    { icon: RotateCcw, text: "Easy returns within 7 days" },
+    ...(product.shelfLife ? [{ icon: Clock, text: `Best within ${product.shelfLife}` }] : []),
+  ];
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
-      <nav className="text-sm text-neutral-600">
-        <Link href="/" className="hover:text-brand">Home</Link> /{" "}
-        {product.category && (
-          <>
-            <Link href={`/category/${product.category}`} className="hover:text-brand">{product.categoryName}</Link> /{" "}
-          </>
-        )}
-        <span>{product.name}</span>
-      </nav>
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          ...(product.category ? [{ label: product.categoryName, href: `/category/${product.category}` }] : []),
+          { label: product.name },
+        ]}
+      />
 
-      <div className="mt-6 grid gap-10 md:grid-cols-2">
-        <ProductImage product={product} className="group aspect-square overflow-hidden rounded-2xl text-[10rem]" />
+      <div className="mt-8 grid gap-10 md:grid-cols-2 lg:gap-16">
+        <ProductGallery product={product} />
 
-        <div>
-          <p className="text-sm font-medium text-brand">{product.categoryName}</p>
-          <h1 className="mt-1 text-3xl font-bold">{product.name}</h1>
-          <p className="mt-1 text-neutral-500">{product.weight}</p>
+        <div className="md:pt-4">
+          {product.categoryName && (
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand">{product.categoryName}</p>
+          )}
+          <h1 className="mt-2 font-display text-3xl font-semibold leading-tight text-ink sm:text-4xl">{product.name}</h1>
+          {product.summary && <p className="mt-3 text-muted">{product.summary}</p>}
 
           <VariantPicker product={product} />
 
-          {product.description && <p className="mt-8 leading-relaxed text-neutral-700">{product.description}</p>}
-          {product.story && <p className="mt-4 leading-relaxed text-neutral-700">{product.story}</p>}
+          <ul className="mt-8 grid gap-3 rounded-2xl bg-cream p-5 sm:grid-cols-2">
+            {perks.map(({ icon: Icon, text }) => (
+              <li key={text} className="flex items-center gap-3 text-sm text-ink/85">
+                <Icon className="h-4 w-4 shrink-0 text-leaf" />
+                {text}
+              </li>
+            ))}
+          </ul>
 
-          {(product.ingredients || product.shelfLife) && (
-            <dl className="mt-6 space-y-2 text-sm text-neutral-700">
-              {product.ingredients && (
-                <div><dt className="inline font-semibold">Ingredients: </dt><dd className="inline">{product.ingredients}</dd></div>
-              )}
-              {product.shelfLife && (
-                <div><dt className="inline font-semibold">Shelf life: </dt><dd className="inline">{product.shelfLife}</dd></div>
-              )}
-            </dl>
+          {(product.description || product.story) && (
+            <div className="mt-8 border-t border-line pt-6">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-ink">About this product</h2>
+              {product.description && <p className="mt-3 leading-relaxed text-ink/80">{product.description}</p>}
+              {product.story && <p className="mt-3 leading-relaxed text-ink/80">{product.story}</p>}
+            </div>
           )}
 
-          <ul className="mt-8 space-y-2 text-sm text-neutral-700">
-            <li>🌱 100% natural, no preservatives</li>
-            <li>🚚 {product.freeDelivery ? "Free delivery on this product" : "Free delivery on orders above ₹499"}</li>
-            <li>↩️ Easy returns within 7 days</li>
-          </ul>
+          {details.length > 0 && (
+            <dl className="mt-6 divide-y divide-line border-y border-line text-sm">
+              {details.map(([label, value]) => (
+                <div key={label} className="grid grid-cols-[120px_1fr] gap-4 py-3">
+                  <dt className="text-muted">{label}</dt>
+                  <dd className="text-ink">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
         </div>
       </div>
 
       {related.length > 0 && (
-        <section className="mt-16">
-          <h2 className="text-2xl font-bold">You May Also Like</h2>
-          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        <section className="mt-20">
+          <SectionHeading eyebrow="More to try" title="You may also like" href={`/category/${product.category}`} />
+          <div className="mt-8 grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
             {related.map((p) => (
-              <ProductCard key={p.slug} product={p} />
+              <ProductCard key={p.id} product={p} />
             ))}
           </div>
         </section>

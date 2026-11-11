@@ -8,8 +8,7 @@ import AddToCartButton from "./AddToCartButton";
 
 /** Price, size choice and Add to Cart on the product page. */
 export default function VariantPicker({ product }: { product: Product }) {
-  const initial = cartLineFor(product).line.id;
-  const [selected, setSelected] = useState(initial);
+  const [selected, setSelected] = useState(() => cartLineFor(product).line.id);
   const { line, inStock } = cartLineFor(product, selected);
   const variant = product.variants.find((v) => v.id === selected);
   const price = variant?.price ?? product.price;
@@ -18,35 +17,42 @@ export default function VariantPicker({ product }: { product: Product }) {
 
   return (
     <>
-      <div className="mt-5 flex items-baseline gap-3">
-        <span className="text-3xl font-bold">{formatPrice(price)}</span>
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <span className="text-3xl font-bold text-ink">{formatPrice(price)}</span>
         {off > 0 && (
           <>
-            <span className="text-lg text-neutral-400 line-through">{formatPrice(mrp)}</span>
-            <span className="rounded bg-green-100 px-2 py-0.5 text-sm font-semibold text-green-700">{off}% OFF</span>
+            <span className="text-lg text-muted line-through">{formatPrice(mrp)}</span>
+            <span className="rounded-full bg-brand-soft px-3 py-1 text-sm font-bold text-brand">Save {off}%</span>
           </>
         )}
       </div>
-      <p className="text-xs text-neutral-500">Inclusive of all taxes</p>
+      <p className="mt-1 text-xs text-muted">Inclusive of all taxes</p>
 
       {product.variants.length > 0 && (
-        <div className="mt-6">
-          <p className="mb-2 text-sm font-semibold">Size</p>
+        <fieldset className="mt-7">
+          <legend className="mb-3 text-sm font-semibold text-ink">
+            Pack size{variant && <span className="font-normal text-muted"> — {variant.name}</span>}
+          </legend>
           <div className="flex flex-wrap gap-2">
-            {product.variants.map((v) => (
-              <button
-                key={v.id}
-                onClick={() => setSelected(v.id)}
-                className={`rounded-lg border px-4 py-2 text-sm ${
-                  v.id === selected ? "border-brand bg-brand text-white" : "border-neutral-300 hover:border-brand"
-                } ${v.inStock ? "" : "opacity-50"}`}
-              >
-                {v.name}
-                {!v.inStock && " (out of stock)"}
-              </button>
-            ))}
+            {product.variants.map((v) => {
+              const active = v.id === selected;
+              return (
+                <button
+                  key={v.id}
+                  type="button"
+                  onClick={() => setSelected(v.id)}
+                  aria-pressed={active}
+                  className={`min-w-20 rounded-xl border px-4 py-2.5 text-left text-sm transition ${
+                    active ? "border-brand bg-brand-soft ring-1 ring-brand" : "border-line bg-white hover:border-ink/40"
+                  } ${v.inStock ? "" : "opacity-60"}`}
+                >
+                  <span className={`block font-semibold ${active ? "text-brand" : "text-ink"}`}>{v.name}</span>
+                  <span className="block text-xs text-muted">{v.inStock ? formatPrice(v.price) : "Out of stock"}</span>
+                </button>
+              );
+            })}
           </div>
-        </div>
+        </fieldset>
       )}
 
       <div className="mt-8 max-w-sm">

@@ -1,16 +1,24 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand: #b3261e;
-  --color-brand-dark: #8c1d17;
-  --color-cream: #fff4ea;
-  --color-peach: #fbd9c4;
+  /* Brand red taken from the akod logo */
+  --color-brand: #e3202a;
+  --color-brand-dark: #b8141d;
+  --color-brand-soft: #fdeceb;
+  --color-sun: #f7c42b;
+  --color-leaf: #3f6b2a;
+  --color-cream: #fbf6ef;
+  --color-sand: #f2e9dd;
+  --color-ink: #1d1a17;
+  --color-muted: #6f675f;
+  --color-line: #ebe3d8;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
 }
 
 body {
   background: #ffffff;
-  color: #1f1f1f;
+  color: var(--color-ink);
 }
 
 .no-scrollbar::-webkit-scrollbar {
