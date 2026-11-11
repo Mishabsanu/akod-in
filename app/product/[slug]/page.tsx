@@ -45,8 +45,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
         ]}
       />
 
-      <div className="mt-8 grid gap-10 md:grid-cols-2 lg:gap-16">
-        <ProductGallery product={product} />
+      <div className="mt-8 grid items-start gap-10 md:grid-cols-[minmax(0,300px)_1fr] lg:grid-cols-[minmax(0,360px)_1fr] lg:gap-16">
+        <div className="mx-auto w-full max-w-[300px] md:sticky md:top-28 md:max-w-[min(100%,52svh)]">
+          <ProductGallery product={product} />
+        </div>
 
         <div className="md:pt-4">
           {product.categoryName && (
