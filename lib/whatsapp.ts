@@ -5,7 +5,10 @@
 import { formatPrice } from "./format";
 import { SITE_URL } from "./site";
 
-export const WHATSAPP_NUMBER = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "").replace(/\D/g, "");
+/** AKOD Foods WhatsApp (+91 90746 84488); NEXT_PUBLIC_WHATSAPP_NUMBER overrides it. */
+export const WHATSAPP_NUMBER = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919074684488").replace(/\D/g, "");
+export const CONTACT_PHONE_DISPLAY = "+91 90746 84488";
+export const CONTACT_EMAIL = "support@akodgroup.com";
 
 /** wa.me link with a pre-filled message. */
 export function whatsappLink(text: string): string {

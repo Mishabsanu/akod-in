@@ -2,7 +2,7 @@ import { Mail, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { getCategories } from "@/lib/data";
-import { GENERAL_MESSAGE, whatsappLink } from "@/lib/whatsapp";
+import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, GENERAL_MESSAGE, whatsappLink } from "@/lib/whatsapp";
 import { WhatsAppIcon } from "./WhatsApp";
 
 export default async function Footer() {
@@ -64,7 +64,11 @@ export default async function Footer() {
                 How to order
               </Link>
             </li>
-            <li>Delivery across India</li>
+            <li>
+              <Link href="/shipping-policy" className="transition hover:text-white">
+                Shipping Policy
+              </Link>
+            </li>
             <li>Returns &amp; Refunds</li>
             <li>Privacy Policy</li>
           </ul>
@@ -79,13 +83,13 @@ export default async function Footer() {
             </li>
             <li>
               <a href={whatsappLink(GENERAL_MESSAGE)} target="_blank" rel="noopener noreferrer" className="flex gap-3 hover:text-white">
-                <WhatsAppIcon className="mt-0.5 h-4 w-4 shrink-0 text-white" /> Chat on WhatsApp
+                <WhatsAppIcon className="mt-0.5 h-4 w-4 shrink-0 text-white" /> {CONTACT_PHONE_DISPLAY}
               </a>
             </li>
             <li className="flex gap-3">
               <Mail className="mt-0.5 h-4 w-4 shrink-0 text-white" />
-              <a href="mailto:support@akod.in" className="hover:text-white">
-                support@akod.in
+              <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-white">
+                {CONTACT_EMAIL}
               </a>
             </li>
           </ul>
