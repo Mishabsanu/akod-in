@@ -58,3 +58,16 @@ body {
     transition-duration: 1ms !important;
   }
 }
+
+/* Cart count bump when something is added */
+@keyframes pop {
+  0% {
+    transform: scale(0.6);
+  }
+  60% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

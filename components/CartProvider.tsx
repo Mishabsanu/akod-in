@@ -18,10 +18,16 @@ export type CartItem = CartLine & { qty: number };
 type CartContextType = {
   items: CartItem[];
   count: number;
-  add: (line: CartLine, qty?: number) => void;
+  subtotal: number;
+  /** Adds and opens the cart drawer (pass `{ silent: true }` to stay put). */
+  add: (line: CartLine, qty?: number, opts?: { silent?: boolean }) => void;
   setQty: (id: string, qty: number) => void;
   remove: (id: string) => void;
   clear: () => void;
+  drawerOpen: boolean;
+  setDrawerOpen: (open: boolean) => void;
+  /** Id of the line just added (for a brief highlight in the drawer). */
+  lastAdded: string | null;
 };
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -50,12 +56,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   }, [items, loaded]);
 
-  const add = (line: CartLine, qty = 1) =>
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [lastAdded, setLastAdded] = useState<string | null>(null);
+
+  const add = (line: CartLine, qty = 1, opts?: { silent?: boolean }) => {
     setItems((prev) => {
       const found = prev.find((i) => i.id === line.id);
       if (found) return prev.map((i) => (i.id === line.id ? { ...i, ...line, qty: i.qty + qty } : i));
       return [...prev, { ...line, qty }];
     });
+    setLastAdded(line.id);
+    window.setTimeout(() => setLastAdded((cur) => (cur === line.id ? null : cur)), 1600);
+    if (!opts?.silent) setDrawerOpen(true);
+  };
 
   const setQty = (id: string, qty: number) =>
     setItems((prev) => (qty <= 0 ? prev.filter((i) => i.id !== id) : prev.map((i) => (i.id === id ? { ...i, qty } : i))));
@@ -63,8 +76,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const remove = (id: string) => setItems((prev) => prev.filter((i) => i.id !== id));
   const clear = () => setItems([]);
   const count = items.reduce((s, i) => s + i.qty, 0);
+  const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
 
-  return <CartContext.Provider value={{ items, count, add, setQty, remove, clear }}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider value={{ items, count, subtotal, add, setQty, remove, clear, drawerOpen, setDrawerOpen, lastAdded }}>
+      {children}
+    </CartContext.Provider>
+  );
 }
 
 export function useCart() {

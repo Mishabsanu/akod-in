@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
+import CartDrawer from "@/components/CartDrawer";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CartProvider } from "@/components/CartProvider";
-import { getCategories } from "@/lib/data";
+import { getCatalog } from "@/lib/data";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const fraunces = Fraunces({ subsets: ["latin"], variable: "--font-fraunces", weight: ["500", "600", "700"] });
@@ -15,14 +16,27 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const categories = (await getCategories()).map(({ slug, name }) => ({ slug, name }));
+  const { categories, products } = await getCatalog();
+  // Only what the header needs (menu, mega menu photos, instant search)
+  const navCategories = categories.map(({ slug, name, productCount }) => ({ slug, name, productCount }));
+  const navProducts = products.map((p) => ({
+    slug: p.slug,
+    name: p.name,
+    image: p.image,
+    tone: p.tone,
+    price: p.price,
+    categoryName: p.categoryName,
+    sizes: p.variants.length,
+  }));
+
   return (
     <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
       <body className="font-sans antialiased">
         <CartProvider>
-          <Header categories={categories} />
+          <Header categories={navCategories} products={navProducts} />
           <main className="min-h-[60vh]">{children}</main>
           <Footer />
+          <CartDrawer />
         </CartProvider>
       </body>
     </html>
