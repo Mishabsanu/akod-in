@@ -36,7 +36,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           action={{ href: "/search", label: "See all products" }}
         />
       ) : (
-        <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4">
+        <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {results.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}

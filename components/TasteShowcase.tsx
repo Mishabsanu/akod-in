@@ -226,7 +226,7 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
           // Rounded so server and browser render identical styles
           let fracX = r4(0.5 + x * 0.36);
           let bottom = r2(21 + (1 - depth) * 30);
-          let scale = r3(0.45 + 0.55 * depth);
+          let scale = r3(0.38 + 0.82 * depth * depth); // front pack bigger, back packs smaller
           let opacity = r3(0.35 + 0.65 * depth);
           let blur = r2((1 - depth) * 5);
           let zIndex = Math.round(depth * 100) + 10;

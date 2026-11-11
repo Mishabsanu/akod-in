@@ -135,7 +135,7 @@ export default async function CategoryPage({
           {list.length === 0 ? (
             <EmptyState icon={PackageOpen} title="Nothing here right now" text="Try turning off “In stock only”." />
           ) : (
-            <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {list.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}

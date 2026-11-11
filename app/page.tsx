@@ -11,7 +11,7 @@ import { GENERAL_MESSAGE } from "@/lib/whatsapp";
 
 export const revalidate = 60;
 
-const GRID = "grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4";
+const GRID = "grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6";
 const WRAP = "mx-auto max-w-[1440px] px-6 sm:px-10";
 
 export default async function Home() {
