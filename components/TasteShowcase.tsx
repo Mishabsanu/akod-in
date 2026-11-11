@@ -2,7 +2,7 @@
 
 import { ArrowLeft, ArrowRight, Check, Plus, X } from "lucide-react";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { cartLineFor } from "@/lib/cart";
 import type { Product } from "@/lib/data";
 import { discountPercent, formatPrice } from "@/lib/format";
@@ -10,37 +10,77 @@ import { useCart } from "./CartProvider";
 import ProductImage from "./ProductImage";
 
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
+const TAU = Math.PI * 2;
+const SPIN_PER_SECOND = TAU / 70; // one slow turn every 70 s
+const MORPH_MS = 850;
+const r2 = (v: number) => Math.round(v * 100) / 100;
+const r3 = (v: number) => Math.round(v * 1000) / 1000;
+const r4 = (v: number) => Math.round(v * 10000) / 10000;
+
+/** Nearest equivalent of `target` to `from` (so the ring turns the short way round). */
+const nearest = (from: number, target: number) => target + Math.round((from - target) / TAU) * TAU;
 
 /**
- * "Try the Taste" — full-screen showcase.
- * Row: packs stand on a turntable, angled toward the centre.
- * Tap one: the others rotate away with a motion blur, the chosen pack swings to the centre,
- * and a side panel slides in with its pack sizes (variants), add to cart and pairings.
+ * Hero: every product stands on a slowly turning ring. Front packs are large and sharp,
+ * packs at the back are small, faded and blurred. Drag to spin.
+ * Tap a pack: it comes to the front, the others blur away, and the side panel slides in
+ * with its pack sizes (variants), add to cart and pairings.
  */
 export default function TasteShowcase({ products }: { products: Product[] }) {
-  const lineup = useMemo(() => {
-    const sorted = [...products].sort((a, b) => Number(Boolean(b.image)) - Number(Boolean(a.image)));
-    const picked: Product[] = [];
-    for (const p of sorted) if (!picked.some((x) => x.category === p.category)) picked.push(p);
-    for (const p of sorted) if (picked.length < 5 && !picked.includes(p)) picked.push(p);
-    return picked.slice(0, 5);
-  }, [products]);
+  const lineup = products;
+  const n = lineup.length;
 
+  const [rot, setRot] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
+  const [morphing, setMorphing] = useState(false);
   const [variantId, setVariantId] = useState<string | undefined>();
   const [added, setAdded] = useState<"one" | "box" | null>(null);
   const { add, items } = useCart();
 
+  const hovering = useRef(false);
+  const drag = useRef<{ x: number; rot: number; moved: boolean } | null>(null);
+  const rotRef = useRef(0);
+  rotRef.current = rot;
+
   const focus = selected !== null ? (lineup[selected] ?? null) : null;
   const open = focus !== null;
+
+  // Slow auto-spin while browsing (paused on hover, drag, when a pack is open, or reduced motion)
+  useEffect(() => {
+    if (open || n < 2) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0;
+    let last = performance.now();
+    const tick = (t: number) => {
+      const dt = Math.min(0.05, (t - last) / 1000);
+      last = t;
+      if (!hovering.current && !drag.current) setRot((r) => r + SPIN_PER_SECOND * dt);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [open, n]);
+
+  const morph = () => {
+    setMorphing(true);
+    window.setTimeout(() => setMorphing(false), MORPH_MS);
+  };
 
   const choose = useCallback(
     (i: number | null) => {
       setAdded(null);
+      setMorphing(true);
+      window.setTimeout(() => setMorphing(false), MORPH_MS);
+      if (i !== null) {
+        // Bring the chosen pack to the front of the ring (so closing returns it there)
+        setRot(nearest(rotRef.current, -(TAU * i) / n));
+        setVariantId(cartLineFor(lineup[i]).line.id);
+      } else {
+        setVariantId(undefined);
+      }
       setSelected(i);
-      setVariantId(i === null ? undefined : cartLineFor(lineup[i]).line.id);
     },
-    [lineup]
+    [lineup, n]
   );
 
   // Shareable link /#try-<slug>, and Esc to go back
@@ -53,10 +93,12 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") choose(null);
+      if (!open && e.key === "ArrowRight") (morph(), setRot((r) => r - TAU / n));
+      if (!open && e.key === "ArrowLeft") (morph(), setRot((r) => r + TAU / n));
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [choose]);
+  }, [choose, open, n]);
 
   const pairings = useMemo(() => {
     if (!focus) return [];
@@ -66,7 +108,7 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
       .map((p) => ({ product: p, ...cartLineFor(p) }));
   }, [focus, products]);
 
-  if (lineup.length === 0) return null;
+  if (n === 0) return null;
 
   const current = focus ? cartLineFor(focus, variantId) : null;
   const variant = focus?.variants.find((v) => v.id === variantId);
@@ -82,9 +124,26 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
     setTimeout(() => setAdded(null), 2000);
   };
 
-  // Turntable: position of each pack across the stage (0..1)
-  const n = lineup.length;
-  const slot = (i: number) => (n === 1 ? 0.5 : 0.12 + (0.76 * i) / (n - 1));
+  // Drag to spin
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (open) return;
+    drag.current = { x: e.clientX, rot, moved: false };
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    const d = drag.current;
+    if (!d) return;
+    const dx = e.clientX - d.x;
+    if (Math.abs(dx) > 4) d.moved = true;
+    if (d.moved) setRot(d.rot + dx * 0.006);
+  };
+  const endDrag = () => {
+    // Let the click handler see whether this was a drag
+    window.setTimeout(() => (drag.current = null), 0);
+  };
+
+  const transition = morphing
+    ? `left ${MORPH_MS}ms ${EASE}, bottom ${MORPH_MS}ms ${EASE}, transform ${MORPH_MS}ms ${EASE}, opacity 600ms ease, filter 600ms ease`
+    : "opacity 300ms ease";
 
   return (
     <section
@@ -93,87 +152,100 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
       }`}
     >
       {/* Stage */}
-      <div className="relative h-[72svh] min-h-[520px] lg:h-[calc(100svh-64px)] lg:min-h-[620px]" style={{ perspective: "1400px" }}>
-        {/* Title / back */}
-        <div className="absolute left-6 top-8 z-40 sm:left-10">
-          <div className={`transition-all duration-500 ${open ? "pointer-events-none -translate-y-2 opacity-0" : "opacity-100"}`}>
-            <h1 className="text-3xl font-light tracking-tight text-neutral-900 sm:text-4xl">Try the Taste.</h1>
-            <p className="mt-2 text-sm text-neutral-500">Tap any pack to take a closer look.</p>
-          </div>
-          <button
-            onClick={() => choose(null)}
-            tabIndex={open ? 0 : -1}
-            className={`absolute left-0 top-0 flex items-center gap-2 whitespace-nowrap text-sm text-neutral-600 transition-all duration-500 hover:text-neutral-900 ${
-              open ? "opacity-100" : "pointer-events-none translate-y-2 opacity-0"
-            }`}
-          >
-            <ArrowLeft className="h-4 w-4" /> All packs
-          </button>
-        </div>
+      <div
+        className={`relative h-[72svh] min-h-[520px] touch-pan-y select-none lg:h-[calc(100svh-64px)] lg:min-h-[620px] ${
+          open ? "" : "cursor-grab active:cursor-grabbing"
+        }`}
+        onPointerEnter={() => (hovering.current = true)}
+        onPointerLeave={() => {
+          hovering.current = false;
+          endDrag();
+        }}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDrag}
+      >
+        <h1 className="sr-only">AKOD Food — natural snacks, oils and more</h1>
 
-        {/* Floor shadow */}
+        {/* Back to the ring */}
+        <button
+          onClick={() => choose(null)}
+          tabIndex={open ? 0 : -1}
+          aria-label="Back to all products"
+          className={`absolute left-6 top-6 z-[300] flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-700 transition-all duration-500 hover:border-neutral-900 hover:text-neutral-900 sm:left-10 ${
+            open ? "opacity-100" : "pointer-events-none -translate-x-2 opacity-0"
+          }`}
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </button>
+
+        {/* Turntable: a visible oval the packs stand on */}
         <div
-          className="pointer-events-none absolute bottom-[13%] h-10 -translate-x-1/2 rounded-[50%] bg-neutral-900/[0.07] blur-xl"
-          style={{
-            left: "calc(var(--stage) * 0.5)",
-            width: open ? "min(26vw, 340px)" : "calc(var(--stage) * 0.8)",
-            transition: `left 800ms ${EASE}, width 800ms ${EASE}`,
-          }}
+          className={`pointer-events-none absolute bottom-[14%] h-[42%] rounded-[50%] border border-neutral-200 bg-[radial-gradient(closest-side,rgba(0,0,0,0.035),transparent)] transition-opacity duration-500 ${
+            open ? "opacity-0" : "opacity-100"
+          }`}
+          style={{ left: "calc(var(--stage) * 0.5)", width: "calc(var(--stage) * 0.84)", transform: "translateX(-50%)" }}
         />
 
-        {/* Packs */}
+        {/* Ring */}
         {lineup.map((p, i) => {
           const active = i === selected;
-          const frac = slot(i);
-          const side = frac < 0.5 ? -1 : frac > 0.5 ? 1 : 0;
-          const dist = Math.abs(frac - 0.5) * 2; // 0 centre … 1 edge
+          const a = (TAU * i) / n + rot;
+          const x = Math.sin(a); // -1 left … 1 right
+          const z = Math.cos(a); // 1 front … -1 back
+          const depth = (z + 1) / 2; // 0 back … 1 front
 
-          let left = `calc(var(--stage) * ${frac})`;
-          let width = "min(15vw, 200px)";
-          let transform = `translateX(-50%) rotateY(${-side * dist * 22}deg) translateZ(${-dist * 60}px)`;
-          let opacity = 1;
-          let filter = "blur(0px)";
-          let z = 10 - Math.round(dist * 5);
+          // Rounded so server and browser render identical styles
+          let fracX = r4(0.5 + x * 0.36);
+          let bottom = r2(17 + (1 - depth) * 33);
+          let scale = r3(0.45 + 0.55 * depth);
+          let opacity = r3(0.35 + 0.65 * depth);
+          let blur = r2((1 - depth) * 5);
+          let zIndex = Math.round(depth * 100) + 10;
 
           if (open && active) {
-            left = "calc(var(--stage) * 0.5)";
-            width = "min(30vw, 360px)";
-            transform = "translateX(-50%) rotateY(0deg) translateZ(0px)";
-            z = 30;
+            fracX = 0.5;
+            bottom = 14;
+            scale = 1.55;
+            opacity = 1;
+            blur = 0;
+            zIndex = 200;
           } else if (open) {
-            const away = i < (selected ?? 0) ? -1 : 1;
-            left = `calc(var(--stage) * ${0.5 + away * (0.6 + dist * 0.2)})`;
-            transform = `translateX(-50%) rotateY(${away * -75}deg) translateZ(-200px)`;
+            fracX = r4(0.5 + (x >= 0 ? 1 : -1) * (0.75 + Math.abs(x) * 0.2));
             opacity = 0;
-            filter = "blur(14px)";
+            blur = 16;
           }
+
+          const showLabel = !open && z > 0.8;
 
           return (
             <button
               key={p.id}
-              onClick={() => choose(active ? null : i)}
-              tabIndex={open && !active ? -1 : 0}
-              aria-label={active ? "Back to all packs" : `Take a closer look at ${p.name}`}
-              className={`group absolute bottom-[14%] origin-bottom outline-none ${open && !active ? "pointer-events-none" : ""}`}
+              onClick={() => {
+                if (drag.current?.moved) return;
+                choose(active ? null : i);
+              }}
+              tabIndex={open ? (active ? 0 : -1) : z > 0.3 ? 0 : -1}
+              aria-label={active ? "Back to all products" : `Take a closer look at ${p.name}`}
+              className={`group absolute w-[min(17vw,270px)] origin-bottom outline-none ${open && !active ? "pointer-events-none" : ""}`}
               style={{
-                left,
-                width,
-                transform,
+                left: `calc(var(--stage) * ${fracX})`,
+                bottom: `${bottom}%`,
+                transform: `translateX(-50%) scale(${scale})`,
                 opacity,
-                filter,
-                zIndex: z,
-                transformStyle: "preserve-3d",
-                transition: `left 800ms ${EASE}, width 800ms ${EASE}, transform 800ms ${EASE}, opacity 600ms ease, filter 600ms ease`,
+                zIndex,
+                filter: `blur(${blur}px)`,
+                transition,
               }}
             >
-              <div className={`transition-transform duration-500 ${!open ? "group-hover:-translate-y-3 group-focus-visible:-translate-y-3" : ""}`}>
+              <div className={`transition-transform duration-500 ${!open && z > 0.3 ? "group-hover:-translate-y-3 group-focus-visible:-translate-y-3" : ""}`}>
                 <div key={active ? "on" : "off"} className={active ? "animate-[swing_900ms_cubic-bezier(0.22,1,0.36,1)]" : ""}>
-                  <ProductImage product={p} bare className="aspect-[3/4.1] w-full" sizes="(max-width: 1024px) 40vw, 360px" priority={i < 3} />
+                  <ProductImage product={p} bare className="aspect-[3/4] w-full" sizes="(max-width: 1024px) 50vw, 420px" priority={z > 0.6} />
                 </div>
               </div>
               <span
-                className={`absolute left-1/2 top-full mt-5 w-[160%] -translate-x-1/2 text-center text-[13px] transition-opacity duration-300 ${
-                  open ? "opacity-0" : "text-neutral-500 group-hover:text-neutral-900"
+                className={`absolute left-1/2 top-full mt-3 w-[180%] -translate-x-1/2 text-center text-[13px] text-neutral-600 transition-opacity duration-300 ${
+                  showLabel ? "opacity-100" : "opacity-0"
                 }`}
               >
                 {p.name}
@@ -186,18 +258,27 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
         {focus && (
           <p
             key={focus.id}
-            className="absolute bottom-[6%] hidden -translate-x-1/2 animate-[fadeUp_700ms_ease_300ms_both] whitespace-nowrap text-center text-sm text-neutral-500 lg:block"
+            className="absolute bottom-[5%] z-[250] hidden -translate-x-1/2 animate-[fadeUp_700ms_ease_300ms_both] whitespace-nowrap text-center text-sm text-neutral-500 lg:block"
             style={{ left: "calc(var(--stage) * 0.5)" }}
           >
             {focus.categoryName} · {focus.name}
           </p>
         )}
+
+        {/* Hint */}
+        <p
+          className={`pointer-events-none absolute bottom-5 left-1/2 -translate-x-1/2 text-xs text-neutral-400 transition-opacity duration-500 ${
+            open ? "opacity-0" : "opacity-100"
+          }`}
+        >
+          Drag to explore · Tap a pack
+        </p>
       </div>
 
       {/* Side panel: only after a pack is chosen */}
       <aside
         aria-hidden={!open}
-        className={`border-neutral-200 bg-white transition-all duration-700 lg:absolute lg:inset-y-0 lg:right-0 lg:w-[400px] lg:border-l ${
+        className={`border-neutral-200 bg-white transition-all duration-700 lg:absolute lg:inset-y-0 lg:right-0 lg:z-[300] lg:w-[400px] lg:border-l ${
           open
             ? "max-h-[1400px] border-t opacity-100 lg:max-h-none lg:translate-x-0 lg:border-t-0"
             : "max-h-0 overflow-hidden opacity-0 lg:max-h-none lg:translate-x-full"

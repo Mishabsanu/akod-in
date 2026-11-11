@@ -4,7 +4,7 @@
 // categories and products with "Show on storefront" switched on appear here.
 // Server-side only: never import this file from a "use client" component.
 // ------------------------------------------------------------------
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { cache } from "react";
 
@@ -12,13 +12,32 @@ import { cache } from "react";
  * Local photo fallback: public/products/<product-slug>.(png|webp|jpg|jpeg), used when the product
  * has no photo in AKOD ECO. Photos uploaded in AKOD ECO always win.
  */
+const PRODUCTS_DIR = path.join(process.cwd(), "public", "products");
 const LOCAL_EXTS = ["png", "webp", "jpg", "jpeg"];
 function localPhoto(slug: string): string | undefined {
   for (const ext of LOCAL_EXTS) {
-    if (existsSync(path.join(process.cwd(), "public", "products", `${slug}.${ext}`))) return `/products/${slug}.${ext}`;
+    if (existsSync(path.join(PRODUCTS_DIR, `${slug}.${ext}`))) return `/products/${slug}.${ext}`;
   }
   return undefined;
 }
+
+/**
+ * Stand-in photos for products that have none yet: the named pack cut-outs in public/products
+ * (e.g. sweet-banana-chips.png). Each product always gets the same one. Remove by uploading
+ * a real photo in AKOD ECO.
+ */
+function standInPhotos(): string[] {
+  try {
+    return readdirSync(PRODUCTS_DIR)
+      .filter((f) => /^[a-z0-9-]+\.png$/.test(f) && !f.startsWith("logo"))
+      .sort()
+      .map((f) => `/products/${f}`);
+  } catch {
+    return [];
+  }
+}
+const pickStandIn = (pool: string[], key: string) =>
+  pool.length ? pool[[...key].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7) % pool.length] : undefined;
 
 export type Category = {
   slug: string;
@@ -111,10 +130,11 @@ export const getCatalog = cache(async () => {
       productCount: c.productCount,
     }));
   const catBySlug = new Map(categories.map((c) => [c.slug, c]));
+  const pool = standInPhotos();
 
   const products: Product[] = data.products.map((p) => {
     const cat = catBySlug.get(p.category);
-    const local = p.images.length ? undefined : localPhoto(p.slug);
+    const local = p.images.length ? undefined : (localPhoto(p.slug) ?? pickStandIn(pool, p.slug));
     return {
       ...p,
       images: local ? [local] : p.images,
