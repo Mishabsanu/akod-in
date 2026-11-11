@@ -153,7 +153,7 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
     >
       {/* Stage */}
       <div
-        className={`relative h-[72svh] min-h-[520px] touch-pan-y select-none lg:h-[calc(100svh-64px)] lg:min-h-[620px] ${
+        className={`relative h-[72svh] min-h-[520px] touch-pan-y select-none lg:h-[calc(100svh-96px)] lg:min-h-[620px] ${
           open ? "" : "cursor-grab active:cursor-grabbing"
         }`}
         onPointerEnter={() => (hovering.current = true)}
@@ -179,9 +179,9 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
           <ArrowLeft className="h-4 w-4" />
         </button>
 
-        {/* Turntable: a visible oval the packs stand on */}
+        {/* Soft floor shadow under the ring */}
         <div
-          className={`pointer-events-none absolute bottom-[14%] h-[42%] rounded-[50%] border border-neutral-200 bg-[radial-gradient(closest-side,rgba(0,0,0,0.035),transparent)] transition-opacity duration-500 ${
+          className={`pointer-events-none absolute bottom-[14%] h-[42%] rounded-[50%] bg-[radial-gradient(closest-side,rgba(0,0,0,0.035),transparent)] transition-opacity duration-500 ${
             open ? "opacity-0" : "opacity-100"
           }`}
           style={{ left: "calc(var(--stage) * 0.5)", width: "calc(var(--stage) * 0.84)", transform: "translateX(-50%)" }}
@@ -227,7 +227,7 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
               }}
               tabIndex={open ? (active ? 0 : -1) : z > 0.3 ? 0 : -1}
               aria-label={active ? "Back to all products" : `Take a closer look at ${p.name}`}
-              className={`group absolute w-[min(17vw,270px)] origin-bottom outline-none ${open && !active ? "pointer-events-none" : ""}`}
+              className={`group absolute w-[28vw] origin-bottom sm:w-[min(17vw,270px)] outline-none ${open && !active ? "pointer-events-none" : ""}`}
               style={{
                 left: `calc(var(--stage) * ${fracX})`,
                 bottom: `${bottom}%`,
