@@ -153,7 +153,7 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
     >
       {/* Stage */}
       <div
-        className={`relative h-[72svh] min-h-[520px] touch-pan-y select-none lg:h-[calc(100svh-96px)] lg:min-h-[620px] ${
+        className={`relative h-[72svh] min-h-[520px] touch-pan-y select-none lg:h-[calc(100svh-101px)] lg:min-h-[620px] ${
           open ? "" : "cursor-grab active:cursor-grabbing"
         }`}
         onPointerEnter={() => (hovering.current = true)}
