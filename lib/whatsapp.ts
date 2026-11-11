@@ -3,9 +3,9 @@
 // Without it, WhatsApp opens and asks the customer which chat to send the message to.
 
 import { formatPrice } from "./format";
+import { SITE_URL } from "./site";
 
 export const WHATSAPP_NUMBER = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "").replace(/\D/g, "");
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/+$/, "");
 
 /** wa.me link with a pre-filled message. */
 export function whatsappLink(text: string): string {

@@ -11,3 +11,15 @@ export const fromBase64Url = (s: string) => Buffer.from(s, "base64url").toString
 export function cutoutUrl(url: string): string {
   return isCutoutSource(url) ? `/api/cutout/${toBase64Url(url)}` : url;
 }
+
+/** Original photo behind a cut-out URL (for share previews and Google, which prefer a plain JPG). */
+export function originalPhoto(url: string): string {
+  const m = /^\/api\/cutout\/([A-Za-z0-9_-]+)$/.exec(url);
+  if (!m) return url;
+  try {
+    const src = fromBase64Url(m[1]);
+    return isCutoutSource(src) ? src : url;
+  } catch {
+    return url;
+  }
+}

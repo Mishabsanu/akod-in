@@ -6,12 +6,13 @@ import SectionHeading from "@/components/SectionHeading";
 import TasteShowcase from "@/components/TasteShowcase";
 import TrustBar from "@/components/TrustBar";
 import { WhatsAppButton } from "@/components/WhatsApp";
+import JsonLd, { itemListLd } from "@/components/JsonLd";
 import { getCatalog } from "@/lib/data";
 import { GENERAL_MESSAGE } from "@/lib/whatsapp";
 
 export const revalidate = 60;
 
-const GRID = "grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6";
+const GRID = "grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4";
 const WRAP = "mx-auto max-w-[1440px] px-6 sm:px-10";
 
 export default async function Home() {
@@ -31,6 +32,7 @@ export default async function Home() {
 
   return (
     <>
+      <JsonLd data={itemListLd("AKOD Kerala banana chips and snacks", products)} />
       <TasteShowcase products={products} />
       <TrustBar />
 

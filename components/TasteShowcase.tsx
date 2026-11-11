@@ -181,7 +181,7 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
       >
-        <h1 className="sr-only">AKOD Food — natural snacks, oils and more</h1>
+        <h1 className="sr-only">AKOD – Best Kerala Banana Chips Online, Made in God&apos;s Own Country</h1>
 
         {/* Back to the ring */}
         <button

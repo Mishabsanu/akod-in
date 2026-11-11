@@ -5,14 +5,36 @@ import ProductCard from "@/components/ProductCard";
 import ProductGallery from "@/components/ProductGallery";
 import SectionHeading from "@/components/SectionHeading";
 import VariantPicker from "@/components/VariantPicker";
-import { getProduct, getProductsByCategory } from "@/lib/data";
+import JsonLd, { breadcrumbLd, productLd } from "@/components/JsonLd";
+import { getProduct, getProductsByCategory, getProducts } from "@/lib/data";
+import { originalPhoto } from "@/lib/cutout";
+import { formatPrice } from "@/lib/format";
 
 export const revalidate = 60;
+
+/** Pre-render every product at build time (new ones render on first visit). */
+export async function generateStaticParams() {
+  return (await getProducts()).map((p) => ({ slug: p.slug }));
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const p = await getProduct(slug);
-  return { title: p ? `${p.name} | AKOD Food` : "AKOD Food", description: p?.summary || p?.description };
+  if (!p) return { title: "Product not found", robots: { index: false } };
+  const sizes = p.variants.map((v) => v.name).join(", ");
+  const title = `${p.name} – Buy Online in India | Kerala Made`;
+  const description =
+    `${p.summary || p.description || `Authentic ${p.name} from Kerala, made in pure coconut oil.`} ` +
+    `${p.variants.length > 1 ? `From ${formatPrice(p.price)}` : formatPrice(p.price)}${sizes ? ` · ${sizes}` : ""}. Order on WhatsApp, delivered across India.`;
+  const image = p.image ? [{ url: originalPhoto(p.image), alt: p.name }] : undefined;
+  return {
+    title,
+    description: description.slice(0, 300),
+    keywords: [p.name, `${p.name} online`, `buy ${p.name}`, p.categoryName, "Kerala banana chips", "AKOD"].filter(Boolean),
+    alternates: { canonical: `/product/${p.slug}` },
+    openGraph: { type: "website", url: `/product/${p.slug}`, title, description, images: image },
+    twitter: { card: "summary_large_image", title, description, images: image?.map((i) => i.url) },
+  };
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -37,6 +59,16 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   return (
     <div className="mx-auto max-w-[1440px] px-6 py-8 sm:px-10">
+      <JsonLd
+        data={[
+          productLd(product),
+          breadcrumbLd([
+            { name: "Home", path: "/" },
+            ...(product.category ? [{ name: product.categoryName, path: `/category/${product.category}` }] : []),
+            { name: product.name, path: `/product/${product.slug}` },
+          ]),
+        ]}
+      />
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
@@ -92,7 +124,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       {related.length > 0 && (
         <section className="mt-20">
           <SectionHeading eyebrow="More to try" title="You may also like" href={`/category/${product.category}`} />
-          <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+          <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}

@@ -4,14 +4,29 @@ import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import EmptyState from "@/components/EmptyState";
 import ProductCard from "@/components/ProductCard";
+import JsonLd, { categoryLd } from "@/components/JsonLd";
 import { getCategories, getCategory, getProductsByCategory } from "@/lib/data";
 
 export const revalidate = 60;
 
+export async function generateStaticParams() {
+  return (await getCategories()).map((c) => ({ slug: c.slug }));
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const cat = await getCategory(slug);
-  return { title: cat ? `${cat.name} | AKOD Food` : "AKOD Food" };
+  if (!cat) return { title: "Category not found", robots: { index: false } };
+  const title = `${cat.name} – Authentic Kerala ${cat.name} Online`;
+  const description =
+    cat.tagline ||
+    `Shop ${cat.productCount} authentic Kerala ${cat.name.toLowerCase()} by AKOD, made in God's Own Country in pure coconut oil. Order on WhatsApp, delivered across India.`;
+  return {
+    title,
+    description,
+    alternates: { canonical: `/category/${cat.slug}` },
+    openGraph: { url: `/category/${cat.slug}`, title, description },
+  };
 }
 
 const SORTS = [
@@ -53,10 +68,12 @@ export default async function CategoryPage({
     <>
       <section className="border-b border-neutral-200 bg-white">
         <div className="mx-auto max-w-[1440px] px-6 py-10 sm:px-10 sm:py-14">
+          <JsonLd data={categoryLd(cat, list)} />
           <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: cat.name }]} />
           <h1 className="mt-4 text-4xl font-light tracking-tight text-neutral-900 sm:text-5xl">{cat.name}</h1>
           <p className="mt-3 max-w-2xl text-muted">
-            {cat.tagline || `${cat.productCount} natural product${cat.productCount === 1 ? "" : "s"}, packed fresh.`}
+            {cat.tagline ||
+              `${cat.productCount} authentic Kerala product${cat.productCount === 1 ? "" : "s"}, made in pure coconut oil and packed fresh in God's Own Country.`}
           </p>
         </div>
       </section>
@@ -135,7 +152,7 @@ export default async function CategoryPage({
           {list.length === 0 ? (
             <EmptyState icon={PackageOpen} title="Nothing here right now" text="Try turning off “In stock only”." />
           ) : (
-            <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
               {list.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}

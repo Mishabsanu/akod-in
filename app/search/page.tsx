@@ -3,7 +3,17 @@ import EmptyState from "@/components/EmptyState";
 import ProductCard from "@/components/ProductCard";
 import { getProducts, searchProducts } from "@/lib/data";
 
-export const metadata = { title: "Shop | AKOD Food" };
+export async function generateMetadata({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const { q = "" } = await searchParams;
+  // Search results are not indexed; the plain "All products" page is
+  return q.trim()
+    ? { title: `Search: ${q.trim()}`, robots: { index: false, follow: true } }
+    : {
+        title: "All Products – Kerala Banana Chips & Snacks",
+        description: "Every AKOD product in one place: Kerala banana chips and authentic Kerala snacks, made in pure coconut oil.",
+        alternates: { canonical: "/search" },
+      };
+}
 
 export default async function SearchPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const { q = "" } = await searchParams;
@@ -36,7 +46,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           action={{ href: "/search", label: "See all products" }}
         />
       ) : (
-        <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+        <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4">
           {results.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}

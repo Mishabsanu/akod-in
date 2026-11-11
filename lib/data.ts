@@ -100,19 +100,27 @@ const displayName = (s: string) =>
 // ---- Fetch ----
 const EMPTY: ApiCatalog = { categories: [], products: [] };
 
+/** Give up on AKOD ECO after this long instead of leaving the page loading. */
+const FETCH_TIMEOUT_MS = 8000;
+/** Last catalog that loaded fine: served when AKOD ECO is slow or down, so the store never goes blank. */
+let lastGood: ApiCatalog | null = null;
+
 async function fetchCatalog(): Promise<ApiCatalog> {
   const headers: Record<string, string> = { Accept: "application/json" };
   if (process.env.STOREFRONT_API_KEY) headers["x-storefront-key"] = process.env.STOREFRONT_API_KEY;
   try {
-    const res = await fetch(`${API_URL}/api/storefront/catalog`, { headers, next: { revalidate: REVALIDATE_SECONDS } });
-    if (!res.ok) {
-      console.error(`[catalog] AKOD ECO responded ${res.status} for ${API_URL}/api/storefront/catalog`);
-      return EMPTY;
-    }
-    return (await res.json()) as ApiCatalog;
+    const res = await fetch(`${API_URL}/api/storefront/catalog`, {
+      headers,
+      next: { revalidate: REVALIDATE_SECONDS, tags: ["catalog"] },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    });
+    if (!res.ok) throw new Error(`AKOD ECO responded ${res.status}`);
+    const data = (await res.json()) as ApiCatalog;
+    if (Array.isArray(data.products) && Array.isArray(data.categories)) lastGood = data;
+    return data;
   } catch (error) {
-    console.error(`[catalog] Could not reach AKOD ECO at ${API_URL}:`, error);
-    return EMPTY;
+    console.error(`[catalog] Could not load from ${API_URL}${lastGood ? " — serving the last good catalog" : ""}:`, error);
+    return lastGood ?? EMPTY;
   }
 }
 

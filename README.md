@@ -10,3 +10,16 @@ AKOD Food online store (Next.js). Products and categories come from AKOD ECO.
 
 Manage products in AKOD ECO → Products. Only active categories and products with
 "Show on storefront" on are shown. Prices, photos, sizes (variants) and stock come from there.
+
+## SEO (www.akod.in)
+
+Built in: page titles and descriptions per product and category, canonical links,
+Open Graph / WhatsApp share previews, `/robots.txt`, `/sitemap.xml`, web app manifest,
+and Google structured data (Organization, WebSite search box, Product with INR prices
+per pack size, Breadcrumbs, product lists).
+
+After going live:
+1. Google Search Console → add `https://www.akod.in` → verify with the HTML tag code in
+   `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` → submit `https://www.akod.in/sitemap.xml`.
+2. Bing Webmaster Tools → same, with `NEXT_PUBLIC_BING_SITE_VERIFICATION`.
+3. Google Business Profile for AKOD (Kerala) — helps "banana chips near me" searches.
