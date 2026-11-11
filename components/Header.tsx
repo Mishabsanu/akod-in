@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -49,9 +50,14 @@ export default function Header({ categories }: { categories: Pick<Category, "slu
         </button>
 
         <Link href="/" className="flex shrink-0 items-center">
-          <span className="rounded-full border-4 border-amber-300 bg-brand px-5 py-2 text-lg font-extrabold italic tracking-wide text-white shadow md:text-2xl">
-            AKOD Food
-          </span>
+          <Image
+            src="/products/logo.jpg"
+            alt="AKOD Food"
+            width={3067}
+            height={2221}
+            priority
+            className="h-12 w-auto md:h-16"
+          />
         </Link>
 
         <form onSubmit={onSearch} className="hidden flex-1 md:flex">

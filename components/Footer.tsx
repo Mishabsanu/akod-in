@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { getCategories } from "@/lib/data";
 
@@ -7,8 +8,8 @@ export default async function Footer() {
     <footer id="contact" className="mt-16 bg-neutral-900 text-neutral-300">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <span className="inline-block rounded-full bg-brand px-4 py-1.5 text-lg font-extrabold italic text-white">
-            AKOD Food
+          <span className="inline-block rounded-xl bg-white p-2">
+            <Image src="/products/logo.jpg" alt="AKOD Food" width={3067} height={2221} className="h-14 w-auto" />
           </span>
           <p className="mt-4 text-sm leading-relaxed">
             Natural snacks, spices, dry fruits, powders and cold pressed oils, delivered fresh to your doorstep.
