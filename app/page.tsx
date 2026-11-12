@@ -4,6 +4,7 @@ import EmptyState from "@/components/EmptyState";
 import ProductCard from "@/components/ProductCard";
 import SectionHeading from "@/components/SectionHeading";
 import TasteShowcase from "@/components/TasteShowcase";
+import OfferBanner from "@/components/OfferBanner";
 import TrustBar from "@/components/TrustBar";
 import { WhatsAppButton } from "@/components/WhatsApp";
 import JsonLd, { itemListLd } from "@/components/JsonLd";
@@ -16,7 +17,7 @@ const GRID = "grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:gri
 const WRAP = "mx-auto max-w-[1440px] px-6 sm:px-10";
 
 export default async function Home() {
-  const { categories, products } = await getCatalog();
+  const { categories, products, offers } = await getCatalog();
 
   if (products.length === 0) {
     return (
@@ -34,6 +35,7 @@ export default async function Home() {
     <>
       <JsonLd data={itemListLd("AKOD Kerala banana chips and snacks", products)} />
       <TasteShowcase products={products} />
+      <OfferBanner offers={offers} products={products} />
       <TrustBar />
 
       {categories.length > 0 && (

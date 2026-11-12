@@ -29,8 +29,9 @@ export default function VariantPicker({ product }: { product: Product }) {
       </div>
       <p className="mt-1 text-xs text-muted">Inclusive of all taxes</p>
       {product.offer && (
-        <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-neutral-900 px-3.5 py-1.5 text-[13px] font-medium text-white">
-          {product.offer.name} · {product.offer.label} applied
+        <p className="mt-3 flex max-w-full items-center gap-2 rounded-full bg-neutral-900 py-1 pl-1 pr-3.5 text-[13px] text-white sm:w-fit">
+          <span className="shrink-0 rounded-full bg-white px-2.5 py-0.5 font-bold text-neutral-900">{product.offer.label}</span>
+          <span className="truncate font-medium">{product.offer.name}</span>
         </p>
       )}
 

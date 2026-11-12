@@ -27,13 +27,18 @@ export default function ProductCard({ product }: { product: Product }) {
         <Link href={`/product/${product.slug}`} className="block">
           <ProductImage product={product} className="aspect-[4/5] rounded-md" />
         </Link>
-        <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
-          {product.offer && (
-            <span className="rounded-full bg-neutral-900 px-2.5 py-1 text-[11px] font-semibold text-white">
-              {product.offer.name} · {product.offer.label}
+        <div className="absolute inset-x-3 top-3 flex items-start">
+          {product.offer ? (
+            <span
+              title={product.offer.name}
+              className="flex max-w-full items-center gap-1.5 overflow-hidden rounded-full bg-neutral-900 py-1 pl-1 pr-2.5 text-[11px] text-white"
+            >
+              <span className="shrink-0 rounded-full bg-white px-2 py-0.5 font-bold text-neutral-900">{product.offer.label}</span>
+              <span className="truncate font-medium">{product.offer.name}</span>
             </span>
+          ) : (
+            off > 0 && <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-brand">{off}% off</span>
           )}
-          {off > 0 && <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-brand">{off}% off</span>}
         </div>
       </div>
 
