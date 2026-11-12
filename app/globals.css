@@ -16,9 +16,40 @@
   --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Never scroll sideways on phones (clip keeps the sticky header working, unlike hidden) */
+html,
+body {
+  overflow-x: clip;
+}
+
 body {
   background: #ffffff;
   color: var(--color-ink);
+  -webkit-tap-highlight-color: transparent;
+}
+
+img,
+video,
+svg {
+  max-width: 100%;
+}
+
+/* Live offer dot */
+@keyframes livePing {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  80%,
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
 }
 
 .no-scrollbar::-webkit-scrollbar {

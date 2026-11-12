@@ -12,7 +12,7 @@ export default async function Footer() {
     <footer id="contact" className="mt-20 bg-black text-white/60">
       {/* About: real text helps search engines understand the brand */}
       <section className="border-b border-white/10">
-        <div className="mx-auto grid max-w-[1440px] gap-8 px-6 py-14 sm:px-10 md:grid-cols-[1fr_1.4fr]">
+        <div className="mx-auto grid max-w-[1440px] gap-8 px-4 py-14 sm:px-6 lg:px-10 md:grid-cols-[1fr_1.4fr]">
           <h2 className="text-2xl font-light leading-snug tracking-tight text-white sm:text-3xl">
             The best Kerala banana chips, made in God&apos;s Own Country.
           </h2>
@@ -30,7 +30,7 @@ export default async function Footer() {
         </div>
       </section>
 
-      <div className="mx-auto grid max-w-[1440px] gap-10 px-6 py-14 sm:grid-cols-2 sm:px-10 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
+      <div className="mx-auto grid max-w-[1440px] gap-10 px-4 py-14 sm:grid-cols-2 sm:px-6 lg:px-10 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
         <div>
           <span className="inline-block rounded-2xl bg-white p-2.5">
             <Image src="/products/logo.jpg" alt="AKOD – Kerala banana chips" width={3067} height={2221} className="h-12 w-auto" />
@@ -111,7 +111,7 @@ export default async function Footer() {
         </div>
       </div>
       <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-2 px-6 py-5 text-xs text-white/50 sm:flex-row sm:px-10">
+        <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-white/50 sm:flex-row sm:px-6 lg:px-10">
           <p>© {new Date().getFullYear()} AKOD Food · www.akod.in</p>
           <p>Made in Kerala, God&apos;s Own Country</p>
         </div>

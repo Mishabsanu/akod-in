@@ -158,12 +158,12 @@ export default function Header({
       >
         {/* Rotating message strip */}
         <div className="bg-neutral-950 text-white">
-          <div className="relative mx-auto flex h-8 max-w-[1440px] items-center justify-center overflow-hidden px-6">
+          <div className="relative mx-auto flex h-8 max-w-[1440px] items-center justify-center overflow-hidden px-4">
             {MESSAGES.map((m, i) => (
               <p
                 key={m}
                 aria-hidden={i !== msg}
-                className={`absolute max-w-[calc(100%-3rem)] truncate text-[10.5px] uppercase tracking-[0.26em] transition-all duration-500 ${
+                className={`absolute max-w-[calc(100%-2rem)] truncate text-[10px] uppercase tracking-[0.18em] sm:text-[10.5px] sm:tracking-[0.26em] transition-all duration-500 ${
                   i === msg ? "translate-y-0 opacity-100" : i === (msg + MESSAGES.length - 1) % MESSAGES.length ? "-translate-y-3 opacity-0" : "translate-y-3 opacity-0"
                 }`}
               >
@@ -180,7 +180,7 @@ export default function Header({
           }`}
           onMouseLeave={closeMega}
         >
-          <div className={`mx-auto grid max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center px-4 transition-all duration-300 sm:px-10 ${scrolled ? "h-[68px]" : "h-[80px] md:h-[104px]"}`}>
+          <div className={`mx-auto grid max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center px-3 transition-all duration-300 sm:px-6 lg:px-10 ${scrolled ? "h-[68px]" : "h-[80px] md:h-[104px]"}`}>
             {/* Left: menu (mobile) / nav (desktop) */}
             <div className="flex items-center gap-7">
               <button className={`${iconBtn} md:hidden`} aria-label="Open menu" onClick={() => setMenuOpen(true)}>
@@ -304,11 +304,11 @@ export default function Header({
           role="dialog"
           aria-modal="true"
           aria-label="Search products"
-          className={`absolute inset-x-0 top-0 bg-white transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          className={`absolute inset-x-0 top-0 max-h-[100svh] overflow-y-auto overscroll-contain bg-white transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
             searchOpen ? "visible translate-y-0 shadow-2xl" : "invisible -translate-y-full"
           }`}
         >
-          <form onSubmit={submitSearch} className="mx-auto flex max-w-[1100px] items-center gap-4 border-b border-neutral-200 px-6 py-6 sm:px-10">
+          <form onSubmit={submitSearch} className="mx-auto flex max-w-[1100px] items-center gap-3 border-b border-neutral-200 px-4 py-4 sm:gap-4 sm:px-10 sm:py-6">
             <Search className="h-5 w-5 shrink-0 text-neutral-400" strokeWidth={1.6} />
             <input
               ref={inputRef}
@@ -325,20 +325,20 @@ export default function Header({
               }}
               placeholder="Search snacks, chips, oils…"
               aria-label="Search products"
-              className="w-full bg-transparent text-2xl font-light tracking-tight text-neutral-900 outline-none placeholder:text-neutral-300 sm:text-3xl"
+              className="w-full min-w-0 bg-transparent text-xl font-light tracking-tight text-neutral-900 outline-none placeholder:text-neutral-300 sm:text-3xl"
             />
             <button type="button" onClick={() => setSearchOpen(false)} aria-label="Close search" className={iconBtn}>
               <X className="h-5 w-5" strokeWidth={1.6} />
             </button>
           </form>
 
-          <div className="mx-auto max-w-[1100px] px-6 py-6 sm:px-10">
-            <div className="mb-4 flex flex-wrap items-center gap-2">
+          <div className="mx-auto max-w-[1100px] px-4 py-5 sm:px-10 sm:py-6">
+            <div className="no-scrollbar -mx-4 mb-4 flex items-center gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:px-0">
               {categories.map((c) => (
                 <Link
                   key={c.slug}
                   href={`/category/${c.slug}`}
-                  className="rounded-full border border-neutral-200 px-4 py-1.5 text-[13px] text-neutral-700 transition hover:border-neutral-900 hover:text-neutral-900"
+                  className="shrink-0 whitespace-nowrap rounded-full border border-neutral-200 px-4 py-1.5 text-[13px] text-neutral-700 transition hover:border-neutral-900 hover:text-neutral-900"
                 >
                   {c.name}
                 </Link>

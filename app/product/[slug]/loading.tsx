@@ -4,7 +4,7 @@ import { Bone, PageLoading } from "@/components/Skeletons";
 export default function Loading() {
   return (
     <PageLoading>
-      <div className="mx-auto max-w-[1440px] px-6 py-8 sm:px-10">
+      <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6 lg:px-10">
         <Bone className="h-4 w-64" />
         <div className="mt-8 grid items-start gap-10 md:grid-cols-[minmax(0,300px)_1fr] lg:grid-cols-[minmax(0,360px)_1fr] lg:gap-16">
           <Bone className="mx-auto aspect-square w-full max-w-[300px] md:max-w-none" />

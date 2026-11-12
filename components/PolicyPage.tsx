@@ -28,7 +28,7 @@ export default function PolicyPage({
   const num = (i: number) => String(i + 1).padStart(2, "0");
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-10 sm:px-10">
+    <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 lg:px-10">
       <JsonLd
         data={breadcrumbLd([
           { name: "Home", path: "/" },
@@ -36,7 +36,7 @@ export default function PolicyPage({
         ])}
       />
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: title }]} />
-      <h1 className="mt-6 text-4xl font-light tracking-tight text-neutral-900">{title}</h1>
+      <h1 className="mt-6 text-3xl font-light tracking-tight text-neutral-900 sm:text-4xl">{title}</h1>
       <p className="mt-3 text-neutral-500">{intro}</p>
 
       <ol className="mt-10 space-y-9">
@@ -46,7 +46,7 @@ export default function PolicyPage({
               <span className="font-mono text-sm text-neutral-400">{num(i)}</span>
               {s.title}
             </h2>
-            <div className="mt-3 space-y-3 pl-8 text-[15px] leading-relaxed text-neutral-600">
+            <div className="mt-3 space-y-3 text-[15px] sm:pl-8 leading-relaxed text-neutral-600">
               {s.body.map((b, j) =>
                 typeof b === "string" ? (
                   <p key={j}>{b}</p>
@@ -77,7 +77,7 @@ export default function PolicyPage({
             <span className="font-mono text-sm text-neutral-400">{num(sections.length)}</span>
             Contact Information
           </h2>
-          <div className="mt-3 pl-8 text-[15px] leading-relaxed text-neutral-600">
+          <div className="mt-3 text-[15px] sm:pl-8 leading-relaxed text-neutral-600">
             <p>{contactLead}</p>
             <address className="mt-3 not-italic">
               <p className="font-medium text-neutral-900">AKOD Foods</p>

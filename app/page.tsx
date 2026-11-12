@@ -13,8 +13,8 @@ import { GENERAL_MESSAGE } from "@/lib/whatsapp";
 
 export const revalidate = 60;
 
-const GRID = "grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4";
-const WRAP = "mx-auto max-w-[1440px] px-6 sm:px-10";
+const GRID = "grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 sm:gap-y-10 md:grid-cols-3 lg:grid-cols-4";
+const WRAP = "mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-10";
 
 export default async function Home() {
   const { categories, products, offers } = await getCatalog();
@@ -75,14 +75,14 @@ export default async function Home() {
 
       {/* How ordering works: WhatsApp */}
       <section id="order" className={`${WRAP} scroll-mt-24 pt-24`}>
-        <div className="grid gap-10 rounded-2xl bg-neutral-950 px-8 py-12 text-white sm:px-12 md:grid-cols-[1.2fr_1fr] md:items-center">
+        <div className="grid gap-10 rounded-2xl bg-neutral-950 px-6 py-10 text-white sm:px-12 sm:py-12 md:grid-cols-[1.2fr_1fr] md:items-center">
           <div>
             <p className="font-mono text-[11px] tracking-[0.2em] text-white/50">HOW TO ORDER</p>
-            <h2 className="mt-3 text-3xl font-light tracking-tight sm:text-4xl">Order in a quick WhatsApp chat.</h2>
+            <h2 className="mt-3 text-2xl font-light tracking-tight sm:text-3xl md:text-4xl">Order in a quick WhatsApp chat.</h2>
             <p className="mt-3 max-w-md text-sm leading-relaxed text-white/60">
               Pick your packs, tap Order on WhatsApp, and we&apos;ll confirm your order, delivery and payment right in the chat.
             </p>
-            <WhatsAppButton text={GENERAL_MESSAGE} label="Chat with us" className="mt-7 bg-white !text-neutral-900 hover:!bg-neutral-200" />
+            <WhatsAppButton text={GENERAL_MESSAGE} label="Chat with us" className="mt-7 w-full bg-white sm:w-auto !text-neutral-900 hover:!bg-neutral-200" />
           </div>
           <ol className="space-y-5">
             {[

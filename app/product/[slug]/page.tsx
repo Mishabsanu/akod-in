@@ -58,7 +58,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   ];
 
   return (
-    <div className="mx-auto max-w-[1440px] px-6 py-8 sm:px-10">
+    <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6 lg:px-10">
       <JsonLd
         data={[
           productLd(product),
@@ -124,7 +124,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       {related.length > 0 && (
         <section className="mt-20">
           <SectionHeading eyebrow="More to try" title="You may also like" href={`/category/${product.category}`} />
-          <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4">
+          <div className="mt-8 grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 sm:gap-y-10 md:grid-cols-3 lg:grid-cols-4">
             {related.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}

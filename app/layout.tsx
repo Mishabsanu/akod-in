@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   other: { "geo.region": "IN", "geo.placename": "India" },
 };
 
-export const viewport: Viewport = { themeColor: "#ffffff", width: "device-width", initialScale: 1 };
+export const viewport: Viewport = { themeColor: "#ffffff", width: "device-width", initialScale: 1, viewportFit: "cover" };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { categories, products, offers } = await getCatalog();

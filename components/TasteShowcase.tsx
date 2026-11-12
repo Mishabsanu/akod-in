@@ -169,8 +169,10 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
     >
       {/* Stage */}
       <div
-        className={`relative h-[72svh] min-h-[480px] touch-pan-y select-none [container-type:size] lg:h-[calc(100svh-137px)] lg:min-h-[520px] lg:max-h-[980px] ${
-          open ? "" : "cursor-grab active:cursor-grabbing"
+        className={`relative touch-pan-y select-none transition-[height] duration-700 [container-type:size] lg:h-[calc(100svh-137px)] lg:min-h-[520px] lg:max-h-[980px] ${
+          open
+            ? "h-[46svh] min-h-[320px] sm:h-[54svh]"
+            : "h-[52svh] min-h-[340px] max-h-[600px] cursor-grab active:cursor-grabbing sm:h-[60svh] sm:max-h-[700px]"
         }`}
         onPointerEnter={() => (hovering.current = true)}
         onPointerLeave={() => {
@@ -188,7 +190,7 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
           onClick={() => choose(null)}
           tabIndex={open ? 0 : -1}
           aria-label="Back to all products"
-          className={`absolute left-6 top-6 z-[300] flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-700 transition-all duration-500 hover:border-neutral-900 hover:text-neutral-900 sm:left-10 ${
+          className={`absolute left-4 top-4 z-[300] flex h-10 w-10 items-center justify-center rounded-full border border-neutral-200 bg-white text-neutral-700 transition-all duration-500 hover:border-neutral-900 hover:text-neutral-900 sm:left-6 sm:top-6 lg:left-10 ${
             open ? "opacity-100" : "pointer-events-none -translate-x-2 opacity-0"
           }`}
         >
@@ -253,7 +255,7 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
               }}
               tabIndex={open ? (active ? 0 : -1) : z > 0.3 ? 0 : -1}
               aria-label={active ? "Back to all products" : `Take a closer look at ${p.name}`}
-              className={`group absolute w-[min(28vw,34cqh)] origin-bottom sm:w-[min(17vw,270px,34cqh)] outline-none ${open && !active ? "pointer-events-none" : ""}`}
+              className={`group absolute w-[min(30vw,36cqh)] origin-bottom outline-none sm:w-[min(22vw,240px,34cqh)] lg:w-[min(17vw,270px,34cqh)] ${open && !active ? "pointer-events-none" : ""}`}
               style={{
                 left: `calc(var(--stage) * ${fracX})`,
                 bottom: `${bottom}%`,
@@ -283,58 +285,65 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
             {focus.categoryName} · {focus.name}
           </p>
         )}
+      </div>
 
-        {/* Bottom bar: counter + front pack, arrows, shop now */}
-        {frontProduct && (
-          <div
-            className={`absolute inset-x-0 bottom-0 z-[250] px-6 pb-6 pr-24 transition-all duration-500 sm:px-10 sm:pr-28 ${
-              open ? "pointer-events-none translate-y-4 opacity-0" : "opacity-100"
-            }`}
-          >
-            <div className="flex items-end justify-between gap-6 border-t border-neutral-900/10 pt-5">
-              <div key={frontProduct.id} className="min-w-0 flex-1 animate-[fadeUp_500ms_ease_both]">
-                <p className="font-mono text-[11px] tracking-[0.2em] text-neutral-400">
-                  <span className="text-neutral-900">{pad((front % realN) + 1)}</span> / {pad(realN)} · {frontProduct.categoryName}
-                </p>
-                <p className="mt-1 truncate text-lg font-light tracking-tight text-neutral-900 sm:text-xl">{frontProduct.name}</p>
-                <p className="text-[13px] text-neutral-500">
-                  {frontProduct.variants.length > 1 ? "From " : ""}
+      {/* Info bar: counter + front pack, arrows, shop now.
+          Phones/tablets: sits below the stage (never covers the packs). Desktop: overlays the stage bottom. */}
+      {frontProduct && (
+        <div
+          className={`relative z-[250] px-4 pb-5 sm:px-6 sm:pb-6 lg:absolute lg:inset-x-0 lg:bottom-0 lg:px-10 lg:pr-28 lg:transition-all lg:duration-500 ${
+            open ? "hidden lg:pointer-events-none lg:block lg:translate-y-4 lg:opacity-0" : ""
+          }`}
+        >
+          <div className="flex flex-col gap-4 border-t border-neutral-900/10 pt-4 sm:flex-row sm:items-end sm:justify-between sm:gap-6 sm:pt-5">
+            <div key={frontProduct.id} className="min-w-0 animate-[fadeUp_500ms_ease_both] sm:flex-1">
+              <p className="flex items-center gap-2 font-mono text-[11px] tracking-[0.18em] text-neutral-400">
+                <span className="shrink-0">
+                  <span className="text-neutral-900">{pad((front % realN) + 1)}</span> / {pad(realN)}
+                </span>
+                <span aria-hidden className="h-px w-5 shrink-0 bg-neutral-300" />
+                <span className="truncate uppercase">{frontProduct.categoryName}</span>
+              </p>
+              <p className="mt-1.5 line-clamp-2 text-lg font-light leading-snug tracking-tight text-neutral-900 sm:line-clamp-1 sm:text-xl">
+                {frontProduct.name}
+              </p>
+              <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-neutral-900">
+                <span>
+                  {frontProduct.variants.length > 1 && <span className="text-neutral-500">From </span>}
                   {formatPrice(frontProduct.price)}
-                  {frontProduct.mrp > frontProduct.price && (
-                    <span className="ml-2 text-neutral-400 line-through">{formatPrice(frontProduct.mrp)}</span>
-                  )}
-                </p>
-              </div>
+                </span>
+                {frontProduct.mrp > frontProduct.price && <span className="text-[13px] text-neutral-400 line-through">{formatPrice(frontProduct.mrp)}</span>}
+                {frontProduct.offer && (
+                  <span className="rounded-full bg-neutral-900 px-2 py-0.5 text-[11px] font-semibold text-white">{frontProduct.offer.label}</span>
+                )}
+              </p>
+            </div>
 
-              <div className="hidden items-center gap-2 sm:flex">
-                <button
-                  onClick={() => step(-1)}
-                  aria-label="Previous product"
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-neutral-300 bg-white text-neutral-900 transition hover:border-neutral-900 hover:bg-neutral-900 hover:text-white"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={() => step(1)}
-                  aria-label="Next product"
-                  className="flex h-11 w-11 items-center justify-center rounded-full border border-neutral-300 bg-white text-neutral-900 transition hover:border-neutral-900 hover:bg-neutral-900 hover:text-white"
-                >
-                  <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
-
-              <div className="flex flex-1 justify-end">
-                <button
-                  onClick={() => choose(front)}
-                  className="inline-flex h-11 items-center gap-2 whitespace-nowrap rounded-full bg-neutral-900 px-6 text-sm font-medium text-white transition hover:bg-neutral-700"
-                >
-                  Shop now <ArrowRight className="h-4 w-4" />
-                </button>
-              </div>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                onClick={() => step(-1)}
+                aria-label="Previous product"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-neutral-300 bg-white text-neutral-900 transition hover:border-neutral-900 hover:bg-neutral-900 hover:text-white"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => step(1)}
+                aria-label="Next product"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-neutral-300 bg-white text-neutral-900 transition hover:border-neutral-900 hover:bg-neutral-900 hover:text-white"
+              >
+                <ArrowRight className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => choose(front)}
+                className="ml-1 inline-flex h-11 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-neutral-900 px-6 text-sm font-medium text-white transition hover:bg-neutral-700 sm:flex-none"
+              >
+                Shop now <ArrowRight className="h-4 w-4" />
+              </button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Side panel: only after a pack is chosen */}
       <aside
@@ -347,7 +356,7 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
         style={{ transitionTimingFunction: EASE }}
       >
         {focus && current && (
-          <div key={focus.id} className="flex h-full flex-col overflow-y-auto px-6 py-8 sm:px-8">
+          <div key={focus.id} className="flex h-full flex-col overflow-y-auto px-4 py-6 sm:px-8 sm:py-8">
             <div className="flex items-start justify-between gap-4">
               <div className="animate-[fadeUp_600ms_ease_200ms_both]">
                 <p className="text-xs uppercase tracking-[0.2em] text-neutral-400">{focus.categoryName}</p>

@@ -9,7 +9,7 @@ export default function Loading() {
         <Bone className="aspect-[3/4] w-[22%] max-w-[260px]" />
         <Bone className="aspect-[3/4] w-[12%] max-w-[150px] opacity-60" />
       </section>
-      <div className="mx-auto max-w-[1440px] px-6 pt-20 sm:px-10">
+      <div className="mx-auto max-w-[1440px] px-4 pt-20 sm:px-6 lg:px-10">
         <Bone className="h-8 w-56" />
         <div className="mt-8">
           <GridSkeleton />

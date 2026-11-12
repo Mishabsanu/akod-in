@@ -37,9 +37,9 @@ export default function CategoryGrid({ categories, products }: { categories: Cat
             }`}
           >
             {/* Text */}
-            <div className={`relative z-30 flex flex-col p-7 sm:p-9 ${wide ? "sm:w-[42%]" : ""}`}>
+            <div className={`relative z-30 flex flex-col p-6 sm:p-9 ${wide ? "sm:w-[42%]" : ""}`}>
               <span className="font-mono text-[11px] tracking-[0.2em] text-neutral-400">{String(ci + 1).padStart(2, "0")}</span>
-              <h3 className={`mt-2 font-light tracking-tight text-neutral-900 ${wide ? "text-4xl sm:text-5xl" : "text-3xl"}`}>{c.name}</h3>
+              <h3 className={`mt-2 font-light tracking-tight text-neutral-900 ${wide ? "text-3xl sm:text-5xl" : "text-2xl sm:text-3xl"}`}>{c.name}</h3>
               <p className="mt-2 text-sm text-neutral-500">
                 {c.tagline || `${c.productCount} product${c.productCount === 1 ? "" : "s"}`}
               </p>

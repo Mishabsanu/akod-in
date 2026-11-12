@@ -67,10 +67,10 @@ export default async function CategoryPage({
   return (
     <>
       <section className="border-b border-neutral-200 bg-white">
-        <div className="mx-auto max-w-[1440px] px-6 py-10 sm:px-10 sm:py-14">
+        <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6 lg:px-10 sm:py-14">
           <JsonLd data={categoryLd(cat, list)} />
           <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: cat.name }]} />
-          <h1 className="mt-4 text-4xl font-light tracking-tight text-neutral-900 sm:text-5xl">{cat.name}</h1>
+          <h1 className="mt-4 text-3xl font-light tracking-tight text-neutral-900 sm:text-5xl">{cat.name}</h1>
           <p className="mt-3 max-w-2xl text-muted">
             {cat.tagline ||
               `${cat.productCount} authentic Kerala product${cat.productCount === 1 ? "" : "s"}, made in pure coconut oil and packed fresh in God's Own Country.`}
@@ -78,7 +78,7 @@ export default async function CategoryPage({
         </div>
       </section>
 
-      <div className="mx-auto grid max-w-[1440px] gap-10 px-6 py-10 sm:px-10 lg:grid-cols-[220px_1fr]">
+      <div className="mx-auto grid max-w-[1440px] gap-10 px-4 py-10 sm:px-6 lg:px-10 lg:grid-cols-[220px_1fr]">
         {/* Sidebar */}
         <aside className="hidden lg:block">
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted">Categories</h2>
@@ -101,7 +101,7 @@ export default async function CategoryPage({
 
         <div>
           {/* Mobile category chips */}
-          <div className="no-scrollbar -mx-4 mb-6 flex gap-2 overflow-x-auto px-4 lg:hidden">
+          <div className="no-scrollbar -mx-4 mb-6 flex gap-2 overflow-x-auto px-4 sm:-mx-6 sm:px-6 lg:hidden">
             {categories.map((c) => (
               <Link
                 key={c.slug}
@@ -134,12 +134,12 @@ export default async function CategoryPage({
                 In stock only
               </Link>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="no-scrollbar -mx-4 flex w-[calc(100%+2rem)] gap-2 overflow-x-auto px-4 sm:mx-0 sm:w-auto sm:flex-wrap sm:px-0">
               {SORTS.map(([key, label]) => (
                 <Link
                   key={key}
                   href={href({ sort: key })}
-                  className={`rounded-full border px-3.5 py-1.5 text-xs font-medium transition ${
+                  className={`shrink-0 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-xs font-medium transition ${
                     sort === key ? "border-ink bg-ink text-white" : "border-line bg-white text-ink/80 hover:border-ink/40"
                   }`}
                 >
@@ -152,7 +152,7 @@ export default async function CategoryPage({
           {list.length === 0 ? (
             <EmptyState icon={PackageOpen} title="Nothing here right now" text="Try turning off “In stock only”." />
           ) : (
-            <div className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 sm:gap-y-10 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
               {list.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}

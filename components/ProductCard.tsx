@@ -27,7 +27,7 @@ export default function ProductCard({ product }: { product: Product }) {
         <Link href={`/product/${product.slug}`} className="block">
           <ProductImage product={product} className="aspect-[4/5] rounded-md" />
         </Link>
-        <div className="absolute inset-x-3 top-3 flex items-start">
+        <div className="absolute inset-x-2 top-2 flex items-start sm:inset-x-3 sm:top-3">
           {product.offer ? (
             <span
               title={product.offer.name}
@@ -43,7 +43,7 @@ export default function ProductCard({ product }: { product: Product }) {
       </div>
 
       <Link href={`/product/${product.slug}`} className="mt-3 block">
-        <p className="text-[15px] font-medium leading-snug text-neutral-900 group-hover:underline">{product.name}</p>
+        <p className="line-clamp-2 text-sm font-medium leading-snug text-neutral-900 group-hover:underline sm:text-[15px]">{product.name}</p>
         <p className="mt-0.5 text-[13px] text-neutral-500">{product.categoryName}</p>
       </Link>
 
@@ -70,9 +70,9 @@ export default function ProductCard({ product }: { product: Product }) {
         </div>
       )}
 
-      <p className="mt-3 text-[15px] text-neutral-900">
+      <p className="mt-2.5 text-sm text-neutral-900 sm:mt-3 sm:text-[15px]">
         {formatPrice(price)}
-        {off > 0 && <span className="ml-2 text-sm text-neutral-400 line-through">{formatPrice(mrp)}</span>}
+        {off > 0 && <span className="ml-1.5 text-xs text-neutral-400 line-through sm:ml-2 sm:text-sm">{formatPrice(mrp)}</span>}
         {product.variants.length <= 1 && line.variant && <span className="ml-2 text-[13px] text-neutral-500">· {line.variant}</span>}
       </p>
 
@@ -82,7 +82,7 @@ export default function ProductCard({ product }: { product: Product }) {
             href={whatsappLink(orderMessage(product, line.variant, price))}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-neutral-900 text-[13px] font-medium text-white transition hover:bg-neutral-700"
+            className="flex h-10 w-full items-center justify-center gap-1.5 rounded-full bg-neutral-900 px-2 text-[12px] sm:gap-2 sm:text-[13px] font-medium text-white transition hover:bg-neutral-700"
           >
             <WhatsAppIcon className="h-4 w-4" /> Order {line.variant}
           </a>
