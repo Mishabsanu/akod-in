@@ -29,7 +29,7 @@ export default function Header({
   /** Live offers, announced first in the top strip, e.g. "Onam Offer · 15% OFF" */
   offers?: { name: string; label: string; description: string }[];
 }) {
-  const MESSAGES = [...offers.map((o) => `${o.name} · ${o.label}${o.description ? ` — ${o.description}` : ""}`), ...BASE_MESSAGES];
+  const MESSAGES = [...offers.map((o) => `${o.label} · ${o.name}`), ...BASE_MESSAGES];
   const pathname = usePathname();
   const router = useRouter();
 
@@ -163,7 +163,7 @@ export default function Header({
               <p
                 key={m}
                 aria-hidden={i !== msg}
-                className={`absolute text-[10.5px] uppercase tracking-[0.26em] transition-all duration-500 ${
+                className={`absolute max-w-[calc(100%-3rem)] truncate text-[10.5px] uppercase tracking-[0.26em] transition-all duration-500 ${
                   i === msg ? "translate-y-0 opacity-100" : i === (msg + MESSAGES.length - 1) % MESSAGES.length ? "-translate-y-3 opacity-0" : "translate-y-3 opacity-0"
                 }`}
               >

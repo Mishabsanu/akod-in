@@ -5,6 +5,7 @@ import ProductCard from "@/components/ProductCard";
 import SectionHeading from "@/components/SectionHeading";
 import TasteShowcase from "@/components/TasteShowcase";
 import OfferBanner from "@/components/OfferBanner";
+import OfferStrip from "@/components/OfferStrip";
 import TrustBar from "@/components/TrustBar";
 import { WhatsAppButton } from "@/components/WhatsApp";
 import JsonLd, { itemListLd } from "@/components/JsonLd";
@@ -64,7 +65,10 @@ export default async function Home() {
         return (
           <section key={c.slug} className={`${WRAP} pt-20`}>
             <SectionHeading title={c.name} href={`/category/${c.slug}`} />
-            <div className={`mt-8 ${GRID}`}>
+            <div className="mt-5">
+              <OfferStrip offers={offers} products={list} />
+            </div>
+            <div className={`mt-6 ${GRID}`}>
               {list.slice(0, 4).map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
