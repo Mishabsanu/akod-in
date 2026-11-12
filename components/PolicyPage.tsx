@@ -7,7 +7,7 @@ import { ADDRESS_LINES, CONTACT_PHONE_DISPLAY, GENERAL_MESSAGE, POLICY_EMAIL, wh
 export type PolicyBlock = string | { ul: string[] } | { ol: string[] } | { h: string };
 export type PolicySection = { title: string; body: PolicyBlock[] };
 
-/** Shared layout for Shipping Policy, Returns & Refunds, etc. Ends with the AKOD Foods contact block. */
+/** Shared layout for Shipping Policy, Returns & Refunds, etc. Ends with the AKOD Group contact block. */
 export default function PolicyPage({
   title,
   intro,
@@ -80,7 +80,7 @@ export default function PolicyPage({
           <div className="mt-3 text-[15px] sm:pl-8 leading-relaxed text-neutral-600">
             <p>{contactLead}</p>
             <address className="mt-3 not-italic">
-              <p className="font-medium text-neutral-900">AKOD Foods</p>
+              <p className="font-medium text-neutral-900">AKOD Group</p>
               {ADDRESS_LINES.map((l) => (
                 <p key={l}>{l}</p>
               ))}

@@ -7,7 +7,7 @@ import ProductCard from "@/components/ProductCard";
 import JsonLd, { categoryLd } from "@/components/JsonLd";
 import { getCategories, getCategory, getProductsByCategory } from "@/lib/data";
 
-export const revalidate = 60;
+export const revalidate = 30;
 
 export async function generateStaticParams() {
   return (await getCategories()).map((c) => ({ slug: c.slug }));

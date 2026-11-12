@@ -100,7 +100,7 @@ export type Offer = {
 type ApiCatalog = { categories: ApiCategory[]; products: ApiProduct[]; offers?: Offer[] };
 
 const API_URL = (process.env.AKOD_ECO_API_URL ?? "http://localhost:3000").replace(/\/+$/, "");
-const REVALIDATE_SECONDS = Number(process.env.CATALOG_REVALIDATE_SECONDS) || 60;
+const REVALIDATE_SECONDS = Number(process.env.CATALOG_REVALIDATE_SECONDS) || 30;
 
 /** Soft backgrounds for photo-less products and categories (literal class names so Tailwind keeps them). */
 const TONES = ["bg-amber-50", "bg-rose-50", "bg-lime-50", "bg-orange-50", "bg-emerald-50", "bg-yellow-50", "bg-stone-100", "bg-red-50"];

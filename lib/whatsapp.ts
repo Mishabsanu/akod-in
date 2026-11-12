@@ -5,7 +5,7 @@
 import { formatPrice } from "./format";
 import { SITE_URL } from "./site";
 
-/** AKOD Foods WhatsApp (+91 90746 84488); NEXT_PUBLIC_WHATSAPP_NUMBER overrides it. */
+/** AKOD Group WhatsApp (+91 90746 84488); NEXT_PUBLIC_WHATSAPP_NUMBER overrides it. */
 export const WHATSAPP_NUMBER = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919074684488").replace(/\D/g, "");
 export const CONTACT_PHONE_DISPLAY = "+91 90746 84488";
 /** General contact (footer, Google business info). */

@@ -88,7 +88,7 @@ export default async function Footer() {
             <li className="flex gap-3">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-white" />
               <address className="not-italic">
-                AKOD Foods
+                AKOD Group
                 {ADDRESS_LINES.map((l) => (
                   <span key={l} className="block">
                     {l}

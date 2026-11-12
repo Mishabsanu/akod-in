@@ -10,7 +10,7 @@ import { getProduct, getProductsByCategory, getProducts } from "@/lib/data";
 import { originalPhoto } from "@/lib/cutout";
 import { formatPrice } from "@/lib/format";
 
-export const revalidate = 60;
+export const revalidate = 30;
 
 /** Pre-render every product at build time (new ones render on first visit). */
 export async function generateStaticParams() {

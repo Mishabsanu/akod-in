@@ -12,8 +12,10 @@ import ProductImage from "./ProductImage";
 
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 const TAU = Math.PI * 2;
-const STEP_EVERY_MS = 3800; // auto-advance one pack
-const MORPH_MS = 850;
+const STEP_EVERY_MS = 6500; // auto-advance one pack (slow, calm pace)
+const MORPH_MS = 1400; // smooth, unhurried turn
+/** Most products shown on the hero ring per screen size; the rest are in the sections below. */
+const RING_LIMITS = { phone: 5, tablet: 7, desktop: 10 };
 const r2 = (v: number) => Math.round(v * 100) / 100;
 const r3 = (v: number) => Math.round(v * 1000) / 1000;
 const r4 = (v: number) => Math.round(v * 10000) / 10000;
@@ -28,16 +30,36 @@ const nearest = (from: number, target: number) => target + Math.round((from - ta
  * with its pack sizes (variants), Order on WhatsApp and pairings.
  */
 export default function TasteShowcase({ products }: { products: Product[] }) {
-  // A few products alone look lost on the ring: repeat them until there are at least 6 slots
-  const realN = products.length;
+  // How many products stand on the ring for this screen (phones first, raised on bigger screens)
+  const [limit, setLimit] = useState(RING_LIMITS.phone);
+  useEffect(() => {
+    const tablet = window.matchMedia("(min-width: 640px)");
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const update = () => setLimit(desktop.matches ? RING_LIMITS.desktop : tablet.matches ? RING_LIMITS.tablet : RING_LIMITS.phone);
+    update();
+    tablet.addEventListener("change", update);
+    desktop.addEventListener("change", update);
+    return () => {
+      tablet.removeEventListener("change", update);
+      desktop.removeEventListener("change", update);
+    };
+  }, []);
+
+  // Products on the ring, in the store's display order (pairings below still use the full list)
+  const ring = useMemo(() => products.slice(0, limit), [products, limit]);
+  // A few products alone look lost on the ring: repeat them until the ring has enough slots
+  const realN = ring.length;
+  const minSlots = Math.min(6, limit);
   const lineup = useMemo(() => {
-    if (realN === 0 || realN >= 6) return products;
-    const times = Math.ceil(6 / realN);
-    return Array.from({ length: realN * times }, (_, i) => products[i % realN]);
-  }, [products, realN]);
+    if (realN === 0 || realN >= minSlots) return ring;
+    const times = Math.ceil(minSlots / realN);
+    return Array.from({ length: realN * times }, (_, i) => ring[i % realN]);
+  }, [ring, realN, minSlots]);
   const n = lineup.length;
 
   const [rot, setRot] = useState(0);
+  // Ring size changed (screen resized): start again from the first pack
+  useEffect(() => setRot(0), [n]);
   const [selected, setSelected] = useState<number | null>(null);
   const [morphing, setMorphing] = useState(false);
   const [variantId, setVariantId] = useState<string | undefined>();
