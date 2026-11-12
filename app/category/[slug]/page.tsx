@@ -5,8 +5,7 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import EmptyState from "@/components/EmptyState";
 import ProductCard from "@/components/ProductCard";
 import JsonLd, { categoryLd } from "@/components/JsonLd";
-import OfferStrip from "@/components/OfferStrip";
-import { getCatalog, getCategories, getCategory, getProductsByCategory } from "@/lib/data";
+import { getCategories, getCategory, getProductsByCategory } from "@/lib/data";
 
 export const revalidate = 60;
 
@@ -46,7 +45,7 @@ export default async function CategoryPage({
 }) {
   const { slug } = await params;
   const { sort = "", stock } = await searchParams;
-  const [cat, categories, { offers }] = await Promise.all([getCategory(slug), getCategories(), getCatalog()]);
+  const [cat, categories] = await Promise.all([getCategory(slug), getCategories()]);
   if (!cat) notFound();
 
   let list = [...(await getProductsByCategory(slug))];
@@ -150,9 +149,6 @@ export default async function CategoryPage({
             </div>
           </div>
 
-          <div className="mb-6">
-            <OfferStrip offers={offers} products={list} />
-          </div>
           {list.length === 0 ? (
             <EmptyState icon={PackageOpen} title="Nothing here right now" text="Try turning off “In stock only”." />
           ) : (
