@@ -13,13 +13,23 @@ import { WhatsAppIcon } from "./WhatsApp";
 export type NavCategory = { slug: string; name: string; productCount: number };
 export type NavProduct = { slug: string; name: string; image?: string; tone: string; price: number; categoryName: string; sizes: number };
 
-const MESSAGES = ["Free delivery on orders above ₹499", "Crafted in pure coconut oil", "No preservatives · No added flavours", "Packed fresh in small batches"];
+const BASE_MESSAGES = ["Free delivery on orders above ₹499", "Crafted in pure coconut oil", "No preservatives · No added flavours", "Packed fresh in small batches"];
 
 /**
  * Header: rotating message strip, centred logo, Shop mega menu with photos, instant search
  * (/ or Ctrl+K), WhatsApp chat. Hides while scrolling down, comes back when scrolling up.
  */
-export default function Header({ categories, products }: { categories: NavCategory[]; products: NavProduct[] }) {
+export default function Header({
+  categories,
+  products,
+  offers = [],
+}: {
+  categories: NavCategory[];
+  products: NavProduct[];
+  /** Live offers, announced first in the top strip, e.g. "Onam Offer · 15% OFF" */
+  offers?: { name: string; label: string; description: string }[];
+}) {
+  const MESSAGES = [...offers.map((o) => `${o.name} · ${o.label}${o.description ? ` — ${o.description}` : ""}`), ...BASE_MESSAGES];
   const pathname = usePathname();
   const router = useRouter();
 
@@ -45,7 +55,7 @@ export default function Header({ categories, products }: { categories: NavCatego
   useEffect(() => {
     const t = window.setInterval(() => setMsg((m) => (m + 1) % MESSAGES.length), 3500);
     return () => window.clearInterval(t);
-  }, []);
+  }, [MESSAGES.length]);
 
   // Solid + compact after scrolling; hide on scroll down, show on scroll up
   useEffect(() => {

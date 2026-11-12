@@ -48,7 +48,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: "#ffffff", width: "device-width", initialScale: 1 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const { categories, products } = await getCatalog();
+  const { categories, products, offers } = await getCatalog();
   // Only what the header needs (menu, mega menu photos, instant search)
   const navCategories = categories.map(({ slug, name, productCount }) => ({ slug, name, productCount }));
   const navProducts = products.map((p) => ({
@@ -65,7 +65,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en-IN" className={`${inter.variable} ${fraunces.variable}`}>
       <body className="font-sans antialiased">
           <JsonLd data={[organizationLd(), websiteLd()]} />
-          <Header categories={navCategories} products={navProducts} />
+          <Header categories={navCategories} products={navProducts} offers={offers.map(({ name, label, description }) => ({ name, label, description }))} />
           <main className="min-h-[60vh]">{children}</main>
           <Footer />
           <WhatsAppFloat />

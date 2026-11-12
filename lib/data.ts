@@ -81,11 +81,23 @@ export type Product = {
   inStock: boolean;
   bestSeller?: boolean;
   variants: Variant[];
+  /** Live offer already applied to the prices above (from AKOD ECO → Offers) */
+  offer?: { id: string; name: string; label: string };
 };
 
 type ApiCategory = { slug: string; name: string; description: string; image: string | null; productCount: number };
 type ApiProduct = Omit<Product, "tone" | "image" | "bestSeller"> & { bestSeller: boolean };
-type ApiCatalog = { categories: ApiCategory[]; products: ApiProduct[] };
+/** A live offer (AKOD ECO → Offers). */
+export type Offer = {
+  id: string;
+  name: string;
+  label: string; // "15% OFF" / "₹50 OFF"
+  description: string;
+  endDate: string; // YYYY-MM-DD or ""
+  appliesTo: "all" | "categories" | "products";
+  categories: string[]; // slugs
+};
+type ApiCatalog = { categories: ApiCategory[]; products: ApiProduct[]; offers?: Offer[] };
 
 const API_URL = (process.env.AKOD_ECO_API_URL ?? "http://localhost:3000").replace(/\/+$/, "");
 const REVALIDATE_SECONDS = Number(process.env.CATALOG_REVALIDATE_SECONDS) || 60;
@@ -98,7 +110,7 @@ const displayName = (s: string) =>
   s === s.toUpperCase() ? s.toLowerCase().replace(/(^|[\s&/-])([a-z])/g, (_, a: string, b: string) => a + b.toUpperCase()) : s;
 
 // ---- Fetch ----
-const EMPTY: ApiCatalog = { categories: [], products: [] };
+const EMPTY: ApiCatalog = { categories: [], products: [], offers: [] };
 
 /** Give up on AKOD ECO after this long instead of leaving the page loading. */
 const FETCH_TIMEOUT_MS = 8000;
@@ -157,7 +169,7 @@ export const getCatalog = cache(async () => {
     };
   });
 
-  return { categories, products };
+  return { categories, products, offers: data.offers ?? [] };
 });
 
 export const getCategories = async () => (await getCatalog()).categories;

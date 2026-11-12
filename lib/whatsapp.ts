@@ -27,8 +27,8 @@ export function whatsappLink(text: string): string {
 }
 
 /** "Hi AKOD! I'd like to order: Sweet Banana Chips (400 g) – ₹349" + product link when the site URL is known. */
-export function orderMessage(p: { name: string; slug: string }, size?: string, price?: number): string {
-  const what = `${p.name}${size ? ` (${size})` : ""}${price ? ` – ${formatPrice(price)}` : ""}`;
+export function orderMessage(p: { name: string; slug: string; offer?: { name: string } }, size?: string, price?: number): string {
+  const what = `${p.name}${size ? ` (${size})` : ""}${price ? ` – ${formatPrice(price)}` : ""}${p.offer ? ` [${p.offer.name}]` : ""}`;
   const link = SITE_URL ? `\n${SITE_URL}/product/${p.slug}` : "";
   return `Hi AKOD! I'd like to order: ${what}${link}`;
 }

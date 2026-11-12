@@ -28,6 +28,11 @@ export default function VariantPicker({ product }: { product: Product }) {
         )}
       </div>
       <p className="mt-1 text-xs text-muted">Inclusive of all taxes</p>
+      {product.offer && (
+        <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-neutral-900 px-3.5 py-1.5 text-[13px] font-medium text-white">
+          {product.offer.name} · {product.offer.label} applied
+        </p>
+      )}
 
       {product.variants.length > 0 && (
         <fieldset className="mt-7">

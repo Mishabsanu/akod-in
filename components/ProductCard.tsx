@@ -27,9 +27,14 @@ export default function ProductCard({ product }: { product: Product }) {
         <Link href={`/product/${product.slug}`} className="block">
           <ProductImage product={product} className="aspect-[4/5] rounded-md" />
         </Link>
-        {off > 0 && (
-          <span className="absolute left-3 top-3 rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-brand">{off}% off</span>
-        )}
+        <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
+          {product.offer && (
+            <span className="rounded-full bg-neutral-900 px-2.5 py-1 text-[11px] font-semibold text-white">
+              {product.offer.name} · {product.offer.label}
+            </span>
+          )}
+          {off > 0 && <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-brand">{off}% off</span>}
+        </div>
       </div>
 
       <Link href={`/product/${product.slug}`} className="mt-3 block">
