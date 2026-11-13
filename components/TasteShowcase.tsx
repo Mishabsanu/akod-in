@@ -13,8 +13,8 @@ import ProductImage from "./ProductImage";
 
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
 const TAU = Math.PI * 2;
-const STEP_EVERY_MS = 6500; // auto-advance one pack (slow, calm pace)
-const MORPH_MS = 1400; // smooth, unhurried turn
+const STEP_EVERY_MS = 4500; // auto-advance one pack every 4.5 s
+const MORPH_MS = 1100; // each turn takes 1.1 s
 /** Most products shown on the hero ring per screen size; the rest are in the sections below. */
 const RING_LIMITS = { phone: 5, tablet: 7, desktop: 10 };
 const r2 = (v: number) => Math.round(v * 100) / 100;
