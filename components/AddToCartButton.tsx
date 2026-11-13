@@ -48,7 +48,7 @@ export default function AddToCartButton({
         {lastAdded === line.id && <Check className="h-3.5 w-3.5" />}
         {qty} in cart
       </span>
-      <button type="button" onClick={() => add(line, 1, { silent: true })} className="flex h-full items-center px-3.5" aria-label="One more">
+      <button type="button" onClick={() => add(line, 1)} className="flex h-full items-center px-3.5" aria-label="One more">
         <Plus className="h-3.5 w-3.5" />
       </button>
     </div>

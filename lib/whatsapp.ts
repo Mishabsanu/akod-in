@@ -35,8 +35,12 @@ export function orderMessage(p: { name: string; slug: string; offer?: { name: st
 
 export const GENERAL_MESSAGE = "Hi AKOD! I have a question about your products.";
 
-/** Orders at or above this get free delivery; below it, the charge is confirmed on WhatsApp. */
+/** Orders at or above this get free delivery; below it a flat delivery fee applies. */
 export const FREE_DELIVERY_ABOVE = 499;
+export const DELIVERY_FEE = 60;
+
+/** Delivery charge for a cart subtotal (0 = free). */
+export const deliveryFee = (subtotal: number) => (subtotal <= 0 || subtotal >= FREE_DELIVERY_ABOVE ? 0 : DELIVERY_FEE);
 
 export type DeliveryAddress = {
   name: string;
@@ -59,7 +63,7 @@ export function cartOrderMessage(
   const lines = items.map(
     (i, n) => `${n + 1}. ${i.name}${i.variant ? ` (${i.variant})` : ""} × ${i.qty} = ${formatPrice(i.price * i.qty)}`
   );
-  const delivery = subtotal >= FREE_DELIVERY_ABOVE ? "Free" : "To be confirmed";
+  const fee = deliveryFee(subtotal);
   const place = [a.address, a.landmark && `Landmark: ${a.landmark}`, [a.city, a.district].filter(Boolean).join(", "), `${a.state} – ${a.pincode}`]
     .filter(Boolean)
     .join("\n");
@@ -69,7 +73,8 @@ export function cartOrderMessage(
     ...lines,
     "",
     `Subtotal: ${formatPrice(subtotal)}`,
-    `Delivery: ${delivery}`,
+    `Delivery: ${fee ? formatPrice(fee) : "Free"}`,
+    `*Total: ${formatPrice(subtotal + fee)}*`,
     "",
     "*Deliver to*",
     a.name,

@@ -9,8 +9,8 @@ type CartContextType = {
   items: CartItem[];
   count: number;
   subtotal: number;
-  /** Adds (and opens the cart drawer unless `silent`). */
-  add: (line: CartLine, qty?: number, opts?: { silent?: boolean }) => void;
+  /** Adds to the cart (the drawer opens only from the header bag). */
+  add: (line: CartLine, qty?: number) => void;
   setQty: (id: string, qty: number) => void;
   remove: (id: string) => void;
   clear: () => void;
@@ -47,7 +47,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   }, [items, loaded]);
 
-  const add = useCallback((line: CartLine, qty = 1, opts?: { silent?: boolean }) => {
+  const add = useCallback((line: CartLine, qty = 1) => {
     setItems((prev) => {
       const found = prev.find((i) => i.id === line.id);
       if (found) return prev.map((i) => (i.id === line.id ? { ...i, ...line, qty: Math.min(MAX_QTY, i.qty + qty) } : i));
@@ -55,7 +55,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     });
     setLastAdded(line.id);
     window.setTimeout(() => setLastAdded((cur) => (cur === line.id ? null : cur)), 1600);
-    if (!opts?.silent) setDrawerOpen(true);
   }, []);
 
   const setQty = useCallback(

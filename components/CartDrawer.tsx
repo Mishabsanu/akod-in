@@ -4,7 +4,7 @@ import { ArrowRight, Minus, Plus, ShoppingBag, Trash2, Truck, X } from "lucide-r
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { formatPrice } from "@/lib/format";
-import { FREE_DELIVERY_ABOVE } from "@/lib/whatsapp";
+import { deliveryFee, FREE_DELIVERY_ABOVE } from "@/lib/whatsapp";
 import { useCart } from "./CartProvider";
 import ProductImage from "./ProductImage";
 
@@ -13,6 +13,7 @@ export default function CartDrawer() {
   const { items, count, subtotal, setQty, remove, drawerOpen, setDrawerOpen, lastAdded } = useCart();
   const closeRef = useRef<HTMLButtonElement>(null);
   const left = Math.max(0, FREE_DELIVERY_ABOVE - subtotal);
+  const fee = deliveryFee(subtotal);
   const progress = Math.min(100, Math.round((subtotal / FREE_DELIVERY_ABOVE) * 100));
 
   useEffect(() => {
@@ -125,7 +126,15 @@ export default function CartDrawer() {
             <div className="border-t border-neutral-200 px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-5 sm:px-6">
               <div className="flex items-baseline justify-between">
                 <span className="text-sm text-neutral-500">Subtotal</span>
-                <span className="text-lg text-neutral-900">{formatPrice(subtotal)}</span>
+                <span className="text-neutral-900">{formatPrice(subtotal)}</span>
+              </div>
+              <div className="mt-1 flex items-baseline justify-between text-sm">
+                <span className="text-neutral-500">Delivery</span>
+                <span className="text-neutral-900">{fee ? formatPrice(fee) : "Free"}</span>
+              </div>
+              <div className="mt-2 flex items-baseline justify-between border-t border-neutral-200 pt-2">
+                <span className="text-sm font-medium text-neutral-900">Total</span>
+                <span className="text-lg text-neutral-900">{formatPrice(subtotal + fee)}</span>
               </div>
               <Link
                 href="/cart"

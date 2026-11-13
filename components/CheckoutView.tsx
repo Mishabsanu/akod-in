@@ -4,7 +4,7 @@ import { CheckCircle2, Minus, Plus, ShoppingBag, Trash2, Truck } from "lucide-re
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { formatPrice } from "@/lib/format";
-import { cartOrderMessage, FREE_DELIVERY_ABOVE, whatsappLink, type DeliveryAddress } from "@/lib/whatsapp";
+import { cartOrderMessage, deliveryFee, FREE_DELIVERY_ABOVE, whatsappLink, type DeliveryAddress } from "@/lib/whatsapp";
 import { useCart } from "./CartProvider";
 import ProductImage from "./ProductImage";
 import { WhatsAppIcon } from "./WhatsApp";
@@ -100,7 +100,8 @@ export default function CheckoutView() {
   };
 
   const border = (k: keyof DeliveryAddress) => (errors[k] ? "border-red-400" : "border-neutral-300");
-  const freeDelivery = subtotal >= FREE_DELIVERY_ABOVE;
+  const fee = deliveryFee(subtotal);
+  const freeDelivery = fee === 0;
 
   if (sent) {
     return (
@@ -269,7 +270,7 @@ export default function CheckoutView() {
           </div>
           <div className="flex justify-between">
             <dt className="text-neutral-500">Delivery</dt>
-            <dd>{freeDelivery ? "Free" : "Confirmed on WhatsApp"}</dd>
+            <dd>{freeDelivery ? "Free" : formatPrice(fee)}</dd>
           </div>
           {!freeDelivery && (
             <p className="flex items-center gap-1.5 text-xs text-neutral-500">
@@ -278,7 +279,7 @@ export default function CheckoutView() {
           )}
           <div className="flex justify-between border-t border-neutral-200 pt-3 text-base font-medium">
             <dt>Total</dt>
-            <dd>{formatPrice(subtotal)}</dd>
+            <dd>{formatPrice(subtotal + fee)}</dd>
           </div>
         </dl>
 
@@ -288,7 +289,7 @@ export default function CheckoutView() {
         >
           <WhatsAppIcon className="h-5 w-5" /> Send order on WhatsApp
         </button>
-        <p className="mt-3 text-center text-xs text-neutral-500">We confirm availability, total and delivery on WhatsApp. No payment here.</p>
+        <p className="mt-3 text-center text-xs text-neutral-500">We confirm availability and delivery time on WhatsApp. No payment here.</p>
       </aside>
     </form>
   );
