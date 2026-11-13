@@ -1,53 +1,47 @@
-import { Award, Gem, Handshake, Heart, ShieldCheck, Sparkle, Truck, type LucideIcon } from "lucide-react";
+import { Award, Gem, Handshake, Heart, ShieldCheck, Truck, type LucideIcon } from "lucide-react";
 
-/** Each promise gets its own colour (icon badge), on a warm Kerala-sunset band. */
-const ITEMS: { icon: LucideIcon; text: string; color: string }[] = [
-  { icon: Gem, text: "Premium quality products", color: "#7C3AED" },
-  { icon: Truck, text: "Free delivery on orders above ₹499", color: "#0E9F6E" },
-  { icon: Award, text: "Authentic flavours of Kerala", color: "#D97706" },
-  { icon: Heart, text: "Goodness in every bite", color: "#E11D48" },
-  { icon: ShieldCheck, text: "A brand you can trust", color: "#2563EB" },
-  { icon: Handshake, text: "Where quality meets trust", color: "#0F766E" },
+/** Brand promises: title (from AKOD) + a short supporting line, each with its own colour. */
+const ITEMS: { icon: LucideIcon; title: string; text: string; color: string; tint: string }[] = [
+  { icon: Gem, title: "Premium quality products", text: "Carefully chosen bananas and ingredients", color: "#7C3AED", tint: "#F3EEFF" },
+  { icon: Truck, title: "Free delivery above ₹499", text: "Flat ₹60 delivery below ₹499", color: "#059669", tint: "#E7F8F1" },
+  { icon: Award, title: "Authentic flavours of Kerala", text: "Traditional recipes from God's Own Country", color: "#D97706", tint: "#FEF4E2" },
+  { icon: Heart, title: "Goodness in every bite", text: "Crunchy, fresh and made in coconut oil", color: "#E11D48", tint: "#FDECEF" },
+  { icon: ShieldCheck, title: "A brand you can trust", text: "Packed fresh in small batches", color: "#2563EB", tint: "#EAF1FE" },
+  { icon: Handshake, title: "Where quality meets trust", text: "Easy ordering, quick replies on WhatsApp", color: "#0F766E", tint: "#E3F4F2" },
 ];
 
-function Row({ hidden = false }: { hidden?: boolean }) {
-  return (
-    <ul aria-hidden={hidden || undefined} className="flex shrink-0 items-center">
-      {ITEMS.map(({ icon: Icon, text, color }) => (
-        <li key={text} className="flex shrink-0 items-center gap-3 px-5 sm:px-7">
-          <span
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white shadow-[0_4px_12px_-4px_rgba(0,0,0,0.35)] ring-2 ring-white/40 sm:h-9 sm:w-9"
-            style={{ color }}
-          >
-            <Icon className="h-4 w-4 sm:h-[18px] sm:w-[18px]" strokeWidth={2.2} />
-          </span>
-          <span className="whitespace-nowrap text-[12px] font-bold uppercase tracking-[0.14em] text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.2)] sm:text-[13.5px]">
-            {text}
-          </span>
-          <Sparkle className="ml-5 h-3.5 w-3.5 shrink-0 fill-yellow-200 text-yellow-200 sm:ml-7" />
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-/** Brand promises, scrolling slowly in a loop (pauses on hover, still for reduced motion). */
+/** "Why choose AKOD": six static promise cards (no motion, easy to scan on any screen). */
 export default function TrustBar() {
   return (
-    <section
-      aria-label="Why AKOD"
-      className="group relative overflow-hidden py-3.5 sm:py-4"
-      style={{ background: "linear-gradient(90deg, #C8102E 0%, #E3202A 25%, #F05A28 60%, #F59E0B 100%)" }}
-    >
-      {/* subtle shine + soft edges in the band's own colours */}
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.18),transparent_55%)]" />
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-[#C8102E] to-transparent sm:w-20" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-[#F59E0B] to-transparent sm:w-20" />
-      <div className="relative flex w-max animate-[marquee_40s_linear_infinite] group-hover:[animation-play-state:paused] motion-reduce:w-full motion-reduce:animate-none motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-y-3">
-        <Row />
-        <div className="flex motion-reduce:hidden">
-          <Row hidden />
+    <section aria-labelledby="why-akod" className="border-b border-neutral-200 bg-[#fafaf9]">
+      <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6 sm:py-12 lg:px-10">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-2 sm:mb-8">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#E3202A]">Why choose AKOD</p>
+            <h2 id="why-akod" className="mt-1.5 text-2xl font-light tracking-tight text-neutral-900 sm:text-3xl">
+              Made with care, delivered with trust
+            </h2>
+          </div>
         </div>
+
+        <ul className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-6">
+          {ITEMS.map(({ icon: Icon, title, text, color, tint }) => (
+            <li
+              key={title}
+              className="group flex flex-col rounded-2xl border border-neutral-200 bg-white p-4 transition duration-300 hover:-translate-y-0.5 hover:border-transparent hover:shadow-[0_14px_30px_-18px_rgba(0,0,0,0.35)] sm:p-5"
+            >
+              <span
+                className="flex h-11 w-11 items-center justify-center rounded-xl transition duration-300 group-hover:scale-105 sm:h-12 sm:w-12"
+                style={{ background: tint, color }}
+              >
+                <Icon className="h-5 w-5 sm:h-[22px] sm:w-[22px]" strokeWidth={2} />
+              </span>
+              <h3 className="mt-4 text-[14px] font-semibold leading-snug text-neutral-900 sm:text-[15px]">{title}</h3>
+              <p className="mt-1 text-[12.5px] leading-relaxed text-neutral-500 sm:text-[13px]">{text}</p>
+              <span className="mt-auto block h-0.5 w-8 rounded-full pt-0 transition-all duration-300 group-hover:w-14" style={{ background: color, marginTop: "1rem" }} />
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

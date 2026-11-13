@@ -102,13 +102,3 @@ svg {
     transform: scale(1);
   }
 }
-
-/* Brand promises band: two identical rows slide left, so the loop is seamless */
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
