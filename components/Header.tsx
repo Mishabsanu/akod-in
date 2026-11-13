@@ -1,12 +1,13 @@
 "use client";
 
-import { ArrowRight, ChevronDown, Menu, Search, X } from "lucide-react";
+import { ArrowRight, ChevronDown, Menu, Search, ShoppingBag, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { formatPrice } from "@/lib/format";
 import { GENERAL_MESSAGE, whatsappLink } from "@/lib/whatsapp";
+import { useCart } from "./CartProvider";
 import ProductImage from "./ProductImage";
 import { WhatsAppIcon } from "./WhatsApp";
 
@@ -235,15 +236,7 @@ export default function Header({
               >
                 <WhatsAppIcon className="h-4 w-4" /> Chat with us
               </a>
-              <a
-                href={whatsappLink(GENERAL_MESSAGE)}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Chat with us on WhatsApp"
-                className={`${iconBtn} sm:hidden`}
-              >
-                <WhatsAppIcon className="h-5 w-5" />
-              </a>
+              <CartButton className={iconBtn} />
             </div>
           </div>
 
@@ -449,5 +442,23 @@ export default function Header({
         </nav>
       </div>
     </>
+  );
+}
+
+/** Header bag: item count, opens the cart drawer. */
+function CartButton({ className }: { className: string }) {
+  const { count, setDrawerOpen } = useCart();
+  return (
+    <button type="button" className={className} aria-label={`Open cart, ${count} items`} onClick={() => setDrawerOpen(true)}>
+      <ShoppingBag className="h-5 w-5" strokeWidth={1.6} />
+      {count > 0 && (
+        <span
+          key={count}
+          className="absolute right-0.5 top-0.5 flex h-[18px] min-w-[18px] animate-[pop_400ms_ease] items-center justify-center rounded-full bg-neutral-900 px-1 text-[10px] font-semibold text-white"
+        >
+          {count}
+        </span>
+      )}
+    </button>
   );
 }

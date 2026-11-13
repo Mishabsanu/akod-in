@@ -8,6 +8,7 @@ import type { Product } from "@/lib/data";
 import { discountPercent, formatPrice } from "@/lib/format";
 import { orderMessage, whatsappLink } from "@/lib/whatsapp";
 import { WhatsAppButton, WhatsAppIcon } from "./WhatsApp";
+import AddToCartButton from "./AddToCartButton";
 import ProductImage from "./ProductImage";
 
 const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
@@ -45,8 +46,12 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
     };
   }, []);
 
-  // Products on the ring, in the store's display order (pairings below still use the full list)
-  const ring = useMemo(() => products.slice(0, limit), [products, limit]);
+  // Products on the ring: the ones ticked "Show in Home Banner" in AKOD ECO (all products when none are),
+  // in the store's display order. Pairings below still use the full list.
+  const ring = useMemo(() => {
+    const picked = products.filter((p) => p.inBanner);
+    return (picked.length ? picked : products).slice(0, limit);
+  }, [products, limit]);
   // A few products alone look lost on the ring: repeat them until the ring has enough slots
   const realN = ring.length;
   const minSlots = Math.min(6, limit);
@@ -435,12 +440,17 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
               </div>
             )}
 
-            <WhatsAppButton
-              text={orderMessage(focus, current.line.variant, current.line.price)}
-              label={current.inStock ? `Order ${current.line.variant} on WhatsApp` : "Out of stock"}
-              disabled={!current.inStock}
-              className="mt-6 w-full shrink-0 animate-[fadeUp_600ms_ease_380ms_both]"
-            />
+            <div className="mt-6 flex shrink-0 animate-[fadeUp_600ms_ease_380ms_both] flex-col gap-2.5">
+              <AddToCartButton line={current.line} inStock={current.inStock} size="lg" />
+              {current.inStock && (
+                <WhatsAppButton
+                  text={orderMessage(focus, current.line.variant, current.line.price)}
+                  label={`Order ${current.line.variant} now on WhatsApp`}
+                  variant="outline"
+                  className="w-full"
+                />
+              )}
+            </div>
             <Link
               href={`/product/${focus.slug}`}
               className="mt-3 text-center text-[13px] text-neutral-500 underline-offset-4 hover:text-neutral-900 hover:underline"

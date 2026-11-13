@@ -6,6 +6,7 @@ import type { Product } from "@/lib/data";
 import { discountPercent, formatPrice } from "@/lib/format";
 import { orderMessage } from "@/lib/whatsapp";
 import { WhatsAppButton } from "./WhatsApp";
+import AddToCartButton from "./AddToCartButton";
 
 /** Price, size choice and Order on WhatsApp on the product page. */
 export default function VariantPicker({ product }: { product: Product }) {
@@ -62,14 +63,11 @@ export default function VariantPicker({ product }: { product: Product }) {
         </fieldset>
       )}
 
-      <div className="mt-8 max-w-sm">
-        <WhatsAppButton
-          text={orderMessage(product, line.variant, line.price)}
-          label={inStock ? "Order on WhatsApp" : "Out of stock"}
-          disabled={!inStock}
-          size="lg"
-          className="w-full"
-        />
+      <div className="mt-8 flex max-w-sm flex-col gap-3">
+        <AddToCartButton line={line} inStock={inStock} size="lg" />
+        {inStock && (
+          <WhatsAppButton text={orderMessage(product, line.variant, line.price)} label="Order now on WhatsApp" variant="outline" size="md" className="w-full" />
+        )}
         <p className="mt-3 text-center text-xs text-neutral-500">We reply on WhatsApp to confirm your order and delivery.</p>
       </div>
     </>

@@ -6,6 +6,7 @@ import { cartLineFor } from "@/lib/cart";
 import type { Product } from "@/lib/data";
 import { discountPercent, formatPrice } from "@/lib/format";
 import { orderMessage, whatsappLink } from "@/lib/whatsapp";
+import AddToCartButton from "./AddToCartButton";
 import ProductImage from "./ProductImage";
 import { WhatsAppIcon } from "./WhatsApp";
 
@@ -76,18 +77,19 @@ export default function ProductCard({ product }: { product: Product }) {
         {product.variants.length <= 1 && line.variant && <span className="ml-2 text-[13px] text-neutral-500">· {line.variant}</span>}
       </p>
 
-      <div className="mt-auto pt-3">
-        {inStock ? (
+      <div className="mt-auto flex gap-2 pt-3">
+        <AddToCartButton line={{ ...line, price }} inStock={inStock} className="min-w-0 flex-1" />
+        {inStock && (
           <a
             href={whatsappLink(orderMessage(product, line.variant, price))}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex h-10 w-full items-center justify-center gap-1.5 rounded-full bg-neutral-900 px-2 text-[12px] sm:gap-2 sm:text-[13px] font-medium text-white transition hover:bg-neutral-700"
+            aria-label={`Order ${product.name} ${line.variant} on WhatsApp now`}
+            title="Order this now on WhatsApp"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-neutral-300 text-neutral-900 transition hover:border-[#25D366] hover:bg-[#25D366] hover:text-white"
           >
-            <WhatsAppIcon className="h-4 w-4" /> Order {line.variant}
+            <WhatsAppIcon className="h-4 w-4" />
           </a>
-        ) : (
-          <span className="flex h-10 w-full items-center justify-center rounded-full bg-neutral-100 text-[13px] text-neutral-400">Out of stock</span>
         )}
       </div>
     </article>

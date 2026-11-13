@@ -1,6 +1,11 @@
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
+import CheckoutView from "@/components/CheckoutView";
 
-// Orders are placed on WhatsApp now; old /cart links go to the home page.
+export const metadata: Metadata = {
+  title: "Your Cart",
+  robots: { index: false, follow: true },
+};
+
 export default function CartPage() {
-  redirect("/");
+  return <CheckoutView />;
 }

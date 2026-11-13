@@ -80,6 +80,8 @@ export type Product = {
   freeDelivery: boolean;
   inStock: boolean;
   bestSeller?: boolean;
+  /** Ticked "Show in Home Banner" in AKOD ECO */
+  inBanner?: boolean;
   variants: Variant[];
   /** Live offer already applied to the prices above (from AKOD ECO → Offers) */
   offer?: { id: string; name: string; label: string };

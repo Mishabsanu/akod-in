@@ -34,3 +34,47 @@ export function orderMessage(p: { name: string; slug: string; offer?: { name: st
 }
 
 export const GENERAL_MESSAGE = "Hi AKOD! I have a question about your products.";
+
+/** Orders at or above this get free delivery; below it, the charge is confirmed on WhatsApp. */
+export const FREE_DELIVERY_ABOVE = 499;
+
+export type DeliveryAddress = {
+  name: string;
+  phone: string;
+  address: string;
+  landmark: string;
+  city: string;
+  district: string;
+  state: string;
+  pincode: string;
+  note: string;
+};
+
+/** Whole cart + delivery address as one WhatsApp order message. */
+export function cartOrderMessage(
+  items: { name: string; variant: string; price: number; qty: number }[],
+  a: DeliveryAddress
+): string {
+  const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
+  const lines = items.map(
+    (i, n) => `${n + 1}. ${i.name}${i.variant ? ` (${i.variant})` : ""} × ${i.qty} = ${formatPrice(i.price * i.qty)}`
+  );
+  const delivery = subtotal >= FREE_DELIVERY_ABOVE ? "Free" : "To be confirmed";
+  const place = [a.address, a.landmark && `Landmark: ${a.landmark}`, [a.city, a.district].filter(Boolean).join(", "), `${a.state} – ${a.pincode}`]
+    .filter(Boolean)
+    .join("\n");
+  return [
+    "Hi AKOD! I'd like to place an order 🛒",
+    "",
+    ...lines,
+    "",
+    `Subtotal: ${formatPrice(subtotal)}`,
+    `Delivery: ${delivery}`,
+    "",
+    "*Deliver to*",
+    a.name,
+    `Phone: ${a.phone}`,
+    place,
+    ...(a.note ? ["", `Note: ${a.note}`] : []),
+  ].join("\n");
+}

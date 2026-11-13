@@ -4,6 +4,8 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { WhatsAppFloat } from "@/components/WhatsApp";
+import { CartProvider } from "@/components/CartProvider";
+import CartDrawer from "@/components/CartDrawer";
 import { getCatalog } from "@/lib/data";
 import { SITE_DESCRIPTION, SITE_KEYWORDS, SITE_NAME, SITE_TAGLINE, SITE_URL } from "@/lib/site";
 import JsonLd, { organizationLd, websiteLd } from "@/components/JsonLd";
@@ -64,11 +66,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en-IN" className={`${inter.variable} ${fraunces.variable}`}>
       <body className="font-sans antialiased">
+        <CartProvider>
           <JsonLd data={[organizationLd(), websiteLd()]} />
           <Header categories={navCategories} products={navProducts} offers={offers.map(({ name, label, description }) => ({ name, label, description }))} />
           <main className="min-h-[60vh]">{children}</main>
           <Footer />
           <WhatsAppFloat />
+          <CartDrawer />
+        </CartProvider>
       </body>
     </html>
   );
