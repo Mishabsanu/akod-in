@@ -28,6 +28,7 @@ function validate(a: DeliveryAddress): Errors {
   if (!/^[6-9]\d{9}$/.test(a.phone.replace(/\D/g, "").replace(/^91(?=\d{10}$)/, ""))) e.phone = "Enter a 10-digit mobile number";
   if (a.address.trim().length < 6) e.address = "Enter house / building, street and area";
   if (a.city.trim().length < 2) e.city = "Enter city / town";
+  if (a.district.trim().length < 2) e.district = "Enter your district";
   if (!a.state) e.state = "Choose a state";
   if (!/^[1-9]\d{5}$/.test(a.pincode.trim())) e.pincode = "Enter a 6-digit PIN code";
   return e;
@@ -191,8 +192,8 @@ export default function CheckoutView() {
           <Field label="City / town" required error={errors.city}>
             <input name="city" value={a.city} onChange={set("city")} autoComplete="address-level2" className={`${input} ${border("city")}`} />
           </Field>
-          <Field label="District">
-            <input name="district" value={a.district} onChange={set("district")} placeholder="Optional" className={`${input} border-neutral-300`} />
+          <Field label="District" required error={errors.district}>
+            <input name="district" value={a.district} onChange={set("district")} autoComplete="address-level3" className={`${input} ${border("district")}`} />
           </Field>
           <Field label="PIN code" required error={errors.pincode}>
             <input
