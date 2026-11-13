@@ -204,10 +204,10 @@ export default function Header({
             </div>
 
             {/* Centre: logo */}
-            <Link href="/" aria-label="AKOD Food home" className="justify-self-center">
+            <Link href="/" aria-label="AKOD GROUP home" className="justify-self-center">
               <Image
                 src="/products/logo.jpg"
-                alt="AKOD Food"
+                alt="AKOD GROUP"
                 width={3067}
                 height={2221}
                 priority
@@ -390,7 +390,7 @@ export default function Header({
           }`}
         >
           <div className="flex items-center justify-between border-b border-neutral-200 px-5 py-4">
-            <Image src="/products/logo.jpg" alt="AKOD Food" width={3067} height={2221} className="h-11 w-auto" />
+            <Image src="/products/logo.jpg" alt="AKOD GROUP" width={3067} height={2221} className="h-11 w-auto" />
             <button onClick={() => setMenuOpen(false)} aria-label="Close menu" className={iconBtn}>
               <X className="h-5 w-5" strokeWidth={1.6} />
             </button>

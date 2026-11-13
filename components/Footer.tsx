@@ -88,7 +88,7 @@ export default async function Footer() {
             <li className="flex gap-3">
               <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-white" />
               <address className="not-italic">
-                AKOD Group
+                AKOD GROUP
                 {ADDRESS_LINES.map((l) => (
                   <span key={l} className="block">
                     {l}
@@ -112,7 +112,7 @@ export default async function Footer() {
       </div>
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-white/50 sm:flex-row sm:px-6 lg:px-10">
-          <p>© {new Date().getFullYear()} AKOD Food · www.akod.in</p>
+          <p>© {new Date().getFullYear()} AKOD GROUP · www.akod.in</p>
           <p>Made in Kerala, God&apos;s Own Country</p>
         </div>
       </div>

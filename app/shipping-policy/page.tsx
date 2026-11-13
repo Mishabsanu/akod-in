@@ -4,7 +4,7 @@ import PolicyPage, { type PolicySection } from "@/components/PolicyPage";
 export const metadata: Metadata = {
   title: "Shipping Policy – Delivery Across India",
   description:
-    "AKOD Group shipping policy: orders processed in 1–3 business days, delivered in 2–5 days within Kerala and 4–8 days across India, with tracking on WhatsApp.",
+    "AKOD GROUP shipping policy: orders processed in 1–3 business days, delivered in 2–5 days within Kerala and 4–8 days across India, with tracking on WhatsApp.",
   alternates: { canonical: "/shipping-policy" },
 };
 
@@ -12,7 +12,7 @@ const SECTIONS: PolicySection[] = [
   {
     title: "Introduction",
     body: [
-      "At AKOD Group, we are committed to delivering quality food products to our customers safely, securely and on time. This Shipping Policy explains how we process, pack and deliver orders placed through our website.",
+      "At AKOD GROUP, we are committed to delivering quality food products to our customers safely, securely and on time. This Shipping Policy explains how we process, pack and deliver orders placed through our website.",
     ],
   },
   {
@@ -67,7 +67,7 @@ const SECTIONS: PolicySection[] = [
     title: "Delivery Issues",
     body: [
       "Customers are requested to provide accurate delivery addresses and contact details while placing orders.",
-      "AKOD Group will not be responsible for delays or failed deliveries resulting from incorrect addresses, incomplete information or the customer's unavailability.",
+      "AKOD GROUP will not be responsible for delays or failed deliveries resulting from incorrect addresses, incomplete information or the customer's unavailability.",
       "If an order is delayed, lost or marked as delivered but not received, customers should contact our support team.",
     ],
   },
@@ -88,7 +88,7 @@ export default function ShippingPolicyPage() {
       path="/shipping-policy"
       sections={SECTIONS}
       contactLead="For shipping-related queries:"
-      closing="We appreciate your trust in AKOD Group."
+      closing="We appreciate your trust in AKOD GROUP."
       related={[
         { href: "/returns-refunds", label: "Returns & Refunds" },
         { href: "/privacy-policy", label: "Privacy Policy" },

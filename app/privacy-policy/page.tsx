@@ -4,7 +4,7 @@ import PolicyPage, { type PolicySection } from "@/components/PolicyPage";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "How AKOD Group collects, uses, stores and protects your personal information when you visit www.akod.in or order our Kerala products.",
+    "How AKOD GROUP collects, uses, stores and protects your personal information when you visit www.akod.in or order our Kerala products.",
   alternates: { canonical: "/privacy-policy" },
 };
 
@@ -115,7 +115,7 @@ const SECTIONS: PolicySection[] = [
     title: "Third-Party Websites",
     body: [
       "Our website may contain links to third-party websites or services.",
-      "AKOD Group is not responsible for the privacy practices of external websites. Customers are encouraged to review their respective privacy policies.",
+      "AKOD GROUP is not responsible for the privacy practices of external websites. Customers are encouraged to review their respective privacy policies.",
     ],
   },
   {
@@ -128,7 +128,7 @@ const SECTIONS: PolicySection[] = [
   {
     title: "Changes to This Privacy Policy",
     body: [
-      "AKOD Group reserves the right to update this Privacy Policy from time to time.",
+      "AKOD GROUP reserves the right to update this Privacy Policy from time to time.",
       "Any changes will be published on this page with the revised effective date.",
     ],
   },

@@ -2,7 +2,7 @@
 // Set NEXT_PUBLIC_SITE_URL to the live address if it ever changes (default https://www.akod.in).
 
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.akod.in").replace(/\/+$/, "");
-export const SITE_NAME = "AKOD Food";
+export const SITE_NAME = "AKOD GROUP";
 export const SITE_TAGLINE = "Best Kerala Banana Chips Online – Made in God's Own Country";
 export const SITE_DESCRIPTION =
   "AKOD brings you the best Kerala banana chips and authentic Kerala snacks, freshly made in God's Own Country in pure coconut oil. No preservatives. Order on WhatsApp – delivered across India.";
@@ -27,7 +27,7 @@ export const SITE_KEYWORDS = [
   "Kerala homemade snacks",
   "no preservatives snacks India",
   "AKOD",
-  "AKOD Food",
+  "AKOD GROUP",
   "AKOD banana chips",
 ];
 
