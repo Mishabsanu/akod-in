@@ -361,12 +361,6 @@ export default function TasteShowcase({ products }: { products: Product[] }) {
               >
                 <ArrowRight className="h-4 w-4" />
               </button>
-              <button
-                onClick={() => choose(front)}
-                className="ml-1 inline-flex h-11 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-neutral-900 px-6 text-sm font-medium text-white transition hover:bg-neutral-700 sm:flex-none"
-              >
-                Shop now <ArrowRight className="h-4 w-4" />
-              </button>
             </div>
           </div>
         </div>

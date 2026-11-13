@@ -1,4 +1,4 @@
-import { Clock, Leaf, Truck } from "lucide-react";
+import { Clock, Truck } from "lucide-react";
 import { notFound } from "next/navigation";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ProductCard from "@/components/ProductCard";
@@ -51,7 +51,6 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   ].filter(([, v]) => v);
 
   const perks = [
-    { icon: Leaf, text: "100% natural, no preservatives" },
     { icon: Truck, text: product.freeDelivery ? "Free delivery on this product" : "Free delivery on orders above ₹499" },
     ...(product.shelfLife ? [{ icon: Clock, text: `Best within ${product.shelfLife}` }] : []),
   ];
