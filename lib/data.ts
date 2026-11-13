@@ -102,7 +102,6 @@ export type Offer = {
 type ApiCatalog = { categories: ApiCategory[]; products: ApiProduct[]; offers?: Offer[] };
 
 const API_URL = (process.env.AKOD_ECO_API_URL ?? "http://localhost:3000").replace(/\/+$/, "");
-const REVALIDATE_SECONDS = Number(process.env.CATALOG_REVALIDATE_SECONDS) || 30;
 
 /** Soft backgrounds for photo-less products and categories (literal class names so Tailwind keeps them). */
 const TONES = ["bg-amber-50", "bg-rose-50", "bg-lime-50", "bg-orange-50", "bg-emerald-50", "bg-yellow-50", "bg-stone-100", "bg-red-50"];
@@ -116,8 +115,6 @@ const EMPTY: ApiCatalog = { categories: [], products: [], offers: [] };
 
 /** Give up on AKOD ECO after this long instead of leaving the page loading. */
 const FETCH_TIMEOUT_MS = 8000;
-/** Last catalog that loaded fine: served when AKOD ECO is slow or down, so the store never goes blank. */
-let lastGood: ApiCatalog | null = null;
 
 async function fetchCatalog(): Promise<ApiCatalog> {
   const headers: Record<string, string> = { Accept: "application/json" };
@@ -125,20 +122,19 @@ async function fetchCatalog(): Promise<ApiCatalog> {
   try {
     const res = await fetch(`${API_URL}/api/storefront/catalog`, {
       headers,
-      next: { revalidate: REVALIDATE_SECONDS, tags: ["catalog"] },
+      cache: "no-store", // always live from AKOD ECO — no caching
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
     if (!res.ok) throw new Error(`AKOD ECO responded ${res.status}`);
     const data = (await res.json()) as ApiCatalog;
-    if (Array.isArray(data.products) && Array.isArray(data.categories)) lastGood = data;
-    return data;
+    return Array.isArray(data.products) && Array.isArray(data.categories) ? data : EMPTY;
   } catch (error) {
-    console.error(`[catalog] Could not load from ${API_URL}${lastGood ? " — serving the last good catalog" : ""}:`, error);
-    return lastGood ?? EMPTY;
+    console.error(`[catalog] Could not load from ${API_URL}:`, error);
+    return EMPTY;
   }
 }
 
-/** Whole catalog, fetched once per request (and cached for REVALIDATE_SECONDS between requests). */
+/** Whole catalog, fetched once per request (never cached). */
 export const getCatalog = cache(async () => {
   const data = await fetchCatalog();
 

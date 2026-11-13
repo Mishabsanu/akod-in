@@ -3,9 +3,9 @@ import { getCatalog } from "@/lib/data";
 import { originalPhoto } from "@/lib/cutout";
 import { absoluteUrl } from "@/lib/site";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
-/** /sitemap.xml — home, every category and every product (with photos), refreshed hourly. */
+/** /sitemap.xml — home, every category and every product (with photos). */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { categories, products } = await getCatalog();
   const now = new Date();

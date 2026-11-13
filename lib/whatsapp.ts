@@ -57,7 +57,8 @@ export type DeliveryAddress = {
 /** Whole cart + delivery address as one WhatsApp order message. */
 export function cartOrderMessage(
   items: { name: string; variant: string; price: number; qty: number }[],
-  a: DeliveryAddress
+  a: DeliveryAddress,
+  orderNo?: string
 ): string {
   const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
   const lines = items.map(
@@ -69,6 +70,7 @@ export function cartOrderMessage(
     .join("\n");
   return [
     "Hi AKOD! I'd like to place an order 🛒",
+    ...(orderNo ? [`Order no: *${orderNo}*`] : []),
     "",
     ...lines,
     "",

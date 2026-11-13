@@ -11,7 +11,7 @@ import JsonLd, { itemListLd } from "@/components/JsonLd";
 import { getCatalog } from "@/lib/data";
 import { GENERAL_MESSAGE } from "@/lib/whatsapp";
 
-export const revalidate = 30;
+export const dynamic = "force-dynamic";
 
 const GRID = "grid grid-cols-2 gap-x-3 gap-y-8 sm:gap-x-6 sm:gap-y-10 md:grid-cols-3 lg:grid-cols-4";
 const WRAP = "mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-10";

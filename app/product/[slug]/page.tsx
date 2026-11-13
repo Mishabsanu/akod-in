@@ -6,16 +6,11 @@ import ProductGallery from "@/components/ProductGallery";
 import SectionHeading from "@/components/SectionHeading";
 import VariantPicker from "@/components/VariantPicker";
 import JsonLd, { breadcrumbLd, productLd } from "@/components/JsonLd";
-import { getProduct, getProductsByCategory, getProducts } from "@/lib/data";
+import { getProduct, getProductsByCategory } from "@/lib/data";
 import { originalPhoto } from "@/lib/cutout";
 import { formatPrice } from "@/lib/format";
 
-export const revalidate = 30;
-
-/** Pre-render every product at build time (new ones render on first visit). */
-export async function generateStaticParams() {
-  return (await getProducts()).map((p) => ({ slug: p.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

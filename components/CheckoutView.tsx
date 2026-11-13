@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Minus, Plus, ShoppingBag, Trash2, Truck } from "lucide-react";
+import { CheckCircle2, Loader2, Minus, Plus, ShoppingBag, Trash2, Truck } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { formatPrice } from "@/lib/format";
@@ -68,6 +68,9 @@ export default function CheckoutView() {
   const [a, setA] = useState<DeliveryAddress>(EMPTY);
   const [errors, setErrors] = useState<Errors>({});
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  /** Order number from AKOD ECO (empty if saving failed; the WhatsApp order still goes through) */
+  const [orderNo, setOrderNo] = useState("");
 
   // Remember the address for next time
   useEffect(() => {
@@ -82,8 +85,9 @@ export default function CheckoutView() {
     if (errors[k]) setErrors((prev) => ({ ...prev, [k]: undefined }));
   };
 
-  const send = (e: React.FormEvent) => {
+  const send = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (sending) return;
     const errs = validate(a);
     setErrors(errs);
     if (Object.keys(errs).length) {
@@ -96,7 +100,31 @@ export default function CheckoutView() {
       void note;
       localStorage.setItem(ADDRESS_KEY, JSON.stringify(keep));
     } catch {}
-    window.open(whatsappLink(cartOrderMessage(items, clean)), "_blank", "noopener,noreferrer");
+    // Open the WhatsApp tab now (in the tap) so phones don't block it; point it at WhatsApp once saved
+    const tab = window.open("", "_blank");
+    setSending(true);
+    let no = "";
+    try {
+      const res = await fetch("/api/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: items.map((i) => ({ id: i.id, qty: i.qty })), customer: clean }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.orderNo) no = String(data.orderNo);
+      else console.warn("[order] not saved:", data.error ?? res.status);
+    } catch (err) {
+      console.warn("[order] not saved:", err);
+    }
+    const link = whatsappLink(cartOrderMessage(items, clean, no || undefined));
+    if (tab && !tab.closed) {
+      tab.opener = null;
+      tab.location.href = link;
+    } else {
+      window.location.href = link;
+    }
+    setOrderNo(no);
+    setSending(false);
     setSent(true);
   };
 
@@ -113,9 +141,14 @@ export default function CheckoutView() {
           WhatsApp has opened with your order. Tap <b className="text-neutral-900">Send</b> there, and we&apos;ll confirm the total and delivery
           time.
         </p>
+        {orderNo && (
+          <p className="mt-4 rounded-full bg-neutral-100 px-4 py-1.5 text-sm">
+            Your order no: <b className="font-semibold text-neutral-900">{orderNo}</b>
+          </p>
+        )}
         <div className="mt-8 flex w-full flex-col gap-3">
           <a
-            href={whatsappLink(cartOrderMessage(items, a))}
+            href={whatsappLink(cartOrderMessage(items, a, orderNo || undefined))}
             target="_blank"
             rel="noopener noreferrer"
             className="flex h-12 items-center justify-center gap-2 rounded-full border border-neutral-900 text-sm font-medium"
@@ -286,9 +319,11 @@ export default function CheckoutView() {
 
         <button
           type="submit"
+          disabled={sending}
           className="mt-5 flex h-13 w-full items-center justify-center gap-2 rounded-full bg-[#25D366] py-3.5 text-[15px] font-semibold text-white shadow-[0_10px_24px_-10px_rgba(37,211,102,0.8)] transition hover:brightness-95"
         >
-          <WhatsAppIcon className="h-5 w-5" /> Send order on WhatsApp
+          {sending ? <Loader2 className="h-5 w-5 animate-spin" /> : <WhatsAppIcon className="h-5 w-5" />}
+          {sending ? "Placing your order…" : "Send order on WhatsApp"}
         </button>
         <p className="mt-3 text-center text-xs text-neutral-500">We confirm availability and delivery time on WhatsApp. No payment here.</p>
       </aside>
