@@ -14,7 +14,14 @@ import { WhatsAppIcon } from "./WhatsApp";
 export type NavCategory = { slug: string; name: string; productCount: number };
 export type NavProduct = { slug: string; name: string; image?: string; tone: string; price: number; categoryName: string; sizes: number };
 
-const BASE_MESSAGES = ["Free delivery on orders above ₹499", "Crafted in pure coconut oil", "No preservatives · No added flavours", "Packed fresh in small batches"];
+const BASE_MESSAGES = [
+  "Free delivery on orders above ₹499",
+  "Premium quality products",
+  "Authentic flavours of Kerala",
+  "Goodness in every bite",
+  "A brand you can trust",
+  "Where quality meets trust",
+];
 
 /**
  * Header: rotating message strip, centred logo, Shop mega menu with photos, instant search
@@ -30,7 +37,8 @@ export default function Header({
   /** Live offers, announced first in the top strip, e.g. "Onam Offer · 15% OFF" */
   offers?: { name: string; label: string; description: string }[];
 }) {
-  const MESSAGES = [...offers.map((o) => `${o.label} · ${o.name}`), ...BASE_MESSAGES];
+  const MESSAGES = BASE_MESSAGES;
+  void offers;
   const pathname = usePathname();
   const router = useRouter();
 
